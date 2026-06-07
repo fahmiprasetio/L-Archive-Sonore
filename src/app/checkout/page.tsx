@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
@@ -37,7 +35,7 @@ export default function CheckoutPage() {
         items,
         amount: totalPrice,
       });
-      
+
       alert('Payment initiation triggered! Connecting to Midtrans soon...');
     } catch (error) {
       console.error('Payment error:', error);
