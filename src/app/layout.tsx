@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import AuthInitializer from "@/components/layout/AuthInitializer";
 
 export default function RootLayout({
   children,
@@ -30,12 +32,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900">
+        <AuthInitializer />
         <Navbar />
-        <main className="flex-1 mx-auto w-full max-w-6xl p-6">
+        <main className="flex-grow mx-auto w-full max-w-6xl p-6">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );
 }
-

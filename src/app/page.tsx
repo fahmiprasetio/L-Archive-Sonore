@@ -58,7 +58,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="text-center py-12 bg-white rounded-lg border border-gray-200">
         <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900 sm:text-5xl">
-          Timbre Premium Instruments
+          L&apos;Archive Sonore Premium Instruments
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-neutral-600">
           Discover handpicked, world-class musical gear crafted for true artisans and creators.

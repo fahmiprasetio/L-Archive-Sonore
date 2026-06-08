@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     // Generate a unique order ID
-    const orderId = `TIMBRE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const orderId = `LARCHIVE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     // Calculate gross amount
     const grossAmount = items.reduce(
