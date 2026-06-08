@@ -34,7 +34,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="mt-1 flex-1 text-sm text-gray-600 line-clamp-2">{product.description}</p>
         <div className="mt-4 flex items-center justify-between">
           <span className="font-bold text-gray-900">
-            ${product.price.toLocaleString()}
+            ${product.price.toLocaleString('en-US')}
           </span>
           <button
             onClick={() => addItem(product)}

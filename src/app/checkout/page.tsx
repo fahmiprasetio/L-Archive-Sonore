@@ -148,7 +148,7 @@ export default function CheckoutPage() {
                   </p>
                 </div>
                 <span className="font-bold text-sm text-neutral-900 flex-shrink-0">
-                  ${(item.product.price * item.quantity).toLocaleString()}
+                  ${(item.product.price * item.quantity).toLocaleString('en-US')}
                 </span>
               </div>
             ))}
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
           <div className="border-t border-gray-200 pt-4 space-y-2 text-sm">
             <div className="flex justify-between text-neutral-600">
               <span>Subtotal</span>
-              <span className="font-semibold text-neutral-900">${totalPrice.toLocaleString()}</span>
+              <span className="font-semibold text-neutral-900">${totalPrice.toLocaleString('en-US')}</span>
             </div>
             <div className="flex justify-between text-neutral-600">
               <span>Shipping</span>
@@ -165,7 +165,7 @@ export default function CheckoutPage() {
             </div>
             <div className="border-t border-gray-200 pt-3 flex justify-between text-base font-bold text-neutral-900">
               <span>Total Amount</span>
-              <span>${totalPrice.toLocaleString()}</span>
+              <span>${totalPrice.toLocaleString('en-US')}</span>
             </div>
           </div>
         </div>

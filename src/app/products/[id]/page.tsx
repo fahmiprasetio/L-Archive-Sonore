@@ -143,7 +143,7 @@ export default function ProductDetailPage({ params }: PageProps) {
             <div>
               <span className="text-sm text-gray-500">Price</span>
               <p className="text-3xl font-bold text-neutral-900">
-                ${product.price.toLocaleString()}
+                ${product.price.toLocaleString('en-US')}
               </p>
             </div>
             <button

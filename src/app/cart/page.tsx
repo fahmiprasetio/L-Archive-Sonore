@@ -71,7 +71,7 @@ export default function CartPage() {
                   {item.product.category}
                 </span>
                 <p className="mt-1 font-bold text-neutral-950">
-                  ${item.product.price.toLocaleString()}
+                  ${item.product.price.toLocaleString('en-US')}
                 </p>
               </div>
 
@@ -121,7 +121,7 @@ export default function CartPage() {
             </div>
             <div className="flex justify-between text-neutral-600">
               <span>Subtotal</span>
-              <span className="font-semibold text-neutral-900">${totalPrice.toLocaleString()}</span>
+              <span className="font-semibold text-neutral-900">${totalPrice.toLocaleString('en-US')}</span>
             </div>
             <div className="flex justify-between text-neutral-600">
               <span>Shipping</span>
@@ -129,7 +129,7 @@ export default function CartPage() {
             </div>
             <div className="border-t border-gray-100 pt-3 flex justify-between text-base font-bold text-neutral-900">
               <span>Total Price</span>
-              <span>${totalPrice.toLocaleString()}</span>
+              <span>${totalPrice.toLocaleString('en-US')}</span>
             </div>
           </div>
 
