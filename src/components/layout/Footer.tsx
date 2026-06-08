@@ -52,13 +52,13 @@ export default function Footer() {
         <div className="relative w-full overflow-hidden bg-transparent">
           {/* Background Image */}
           <img
-            src="/gambar%20footer%202b.png"
+            src="/gambar%20footer%203.png"
             alt="L'Archive Sonore Footer Background"
             className="w-full h-auto block opacity-90 brightness-[0.85] contrast-[1.05]"
           />
           {/* Text Overlay */}
           <div className="absolute inset-0 flex items-center justify-center p-4 bg-black/10">
-            <h2 className="text-white text-[9.5vw] font-medium tracking-wide text-center uppercase font-clash leading-none whitespace-nowrap scale-y-145 origin-center mt-35 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+            <h2 className="text-white text-[9.5vw] font-medium tracking-wide text-center uppercase font-clash leading-none whitespace-nowrap scale-y-105 origin-center mt-35 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
               L&apos;Archive Sonore
             </h2>
           </div>
