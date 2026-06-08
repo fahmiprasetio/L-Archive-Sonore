@@ -15,11 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "L'Archive Sonore",
   description: "A sanctuary for sonic artists and premium instrument archives.",
+  icons: {
+    icon: "/logo_title.png",
+  },
 };
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AuthInitializer from "@/components/layout/AuthInitializer";
+import MainWrapper from "@/components/layout/MainWrapper";
 
 export default function RootLayout({
   children,
@@ -34,9 +38,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900">
         <AuthInitializer />
         <Navbar />
-        <main className="flex-grow mx-auto w-full max-w-6xl p-6">
+        <MainWrapper>
           {children}
-        </main>
+        </MainWrapper>
         <Footer />
       </body>
     </html>
