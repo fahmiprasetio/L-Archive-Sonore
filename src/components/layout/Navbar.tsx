@@ -18,27 +18,28 @@ export default function Navbar() {
   const [isTransparent, setIsTransparent] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
+  // Check scroll position on mount or pathname change
   useEffect(() => {
-    // Immediate check on mount/pathname change
     const checkScroll = () => {
       const currentScrollY = window.scrollY;
-      if (isHome && currentScrollY <= 300) {
+      if (isHome && currentScrollY <= 50) {
         setIsTransparent(true);
       } else {
         setIsTransparent(false);
       }
     };
-
     checkScroll();
+  }, [isHome]);
 
+  useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
       // Transparent logic for homepage
       if (isHome) {
-        if (currentScrollY <= 300) {
+        if (currentScrollY <= 50) {
           setIsTransparent(true);
-        } else {
+        } else if (currentScrollY < lastScrollY) {
           setIsTransparent(false);
         }
       } else {

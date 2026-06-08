@@ -58,29 +58,29 @@ export default function Home() {
       {/* Hero Section */}
       <section
         className="relative w-full flex flex-col items-center justify-center text-center overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: "url('/HERO_SECTION2.png')", aspectRatio: "1280/806" }}
+        style={{ backgroundImage: "url('/HERO_SECTION.png')", aspectRatio: "1280/806" }}
       >
         {/* Content */}
         <div className="relative z-10 max-w-4xl px-4 sm:px-6 flex flex-col items-center justify-center">
           <h1 className="flex flex-col items-center text-center">
-            <span className="font-cormorant italic font-light text-white text-3xl sm:text-5xl md:text-6xl lg:text-8xl tracking-normal capitalize drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+            <span className="font-cormorant italic font-light text-white text-3xl sm:text-5xl md:text-6xl lg:text-8xl tracking-normal capitalize drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]">
               L&apos;Archive
             </span>
-            <span className="font-clash font-bold text-white text-4xl sm:text-6xl md:text-7xl lg:text-9xl tracking-widest uppercase mt-[-8px] sm:mt-[-16px] md:mt-[-20px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+            <span className="font-clash font-medium text-white text-7xl sm:text-6xl md:text-7xl lg:text-8xl tracking-normal uppercase mt-2vh sm:mt-[-16px] md:mt-[-20px] -lg:mt-0.7 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
               Sonore
             </span>
           </h1>
 
           {/* Elegant thin long down arrow scroll indicator */}
           <div className="pt-8 sm:pt-14 md:pt-20 flex justify-center">
-            <svg 
-              className="w-6 sm:w-8 h-20 sm:h-32 text-white/40 hover:text-white transition-colors duration-300" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-              strokeWidth="0.75"
+            <svg
+              className="w-8 sm:w-10 h-32 sm:h-48 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 48"
+              strokeWidth="0.5"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20m0 0l-4-4m4 4l4-4" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v44m0 0l-6-6m6 6l6-6" />
             </svg>
           </div>
         </div>
