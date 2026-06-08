@@ -1,57 +1,67 @@
-import Link from 'next/link';
-
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-neutral-50 px-6 py-10 mt-auto">
-      <div className="mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Column: Brand */}
-        <div className="space-y-3">
-          <Link href="/" className="text-lg font-bold tracking-tight text-neutral-900">
-            L&apos;Archive Sonore
-          </Link>
-          <p className="text-sm text-neutral-600 max-w-xs leading-relaxed">
-            The premium collection of legendary instruments for discerning musicians and creators worldwide.
+    <footer className="w-full bg-black text-sage-secondary pt-16 pb-8 mt-16 select-none font-sans">
+      {/* Top Section: Info Grid */}
+      <div className="mx-auto max-w-[96%] px-4 grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
+        {/* Left Big Text */}
+        <div className="md:col-span-2 space-y-4">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-sage-primary leading-snug uppercase">
+            An e-commerce platform dedicated to premium musical gear, refined aesthetics, and classic sound archiving.
+          </h3>
+        </div>
+
+        {/* Right Columns */}
+        <div className="space-y-2 text-xs">
+          <h4 className="font-bold text-sage-primary uppercase tracking-wider">Address</h4>
+          <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+            Sound Avenue 42,<br />
+            Jakarta, Indonesia
           </p>
         </div>
 
-        {/* Middle Column: Quick Links */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">Explore</h4>
-          <ul className="space-y-2 text-sm text-neutral-600">
-            <li>
-              <Link href="/" className="hover:text-neutral-900 transition">
-                Instrument Catalog
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="hover:text-neutral-900 transition">
-                About the Archive
-              </Link>
-            </li>
-          </ul>
+        <div className="space-y-2 text-xs">
+          <h4 className="font-bold text-sage-primary uppercase tracking-wider">New Projects</h4>
+          <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+            hello@larchivesonore.com
+          </p>
         </div>
 
-        {/* Right Column: Contact Placeholder */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">Support</h4>
-          <ul className="space-y-2 text-sm text-neutral-600">
-            <li>
-              <span className="block font-medium">Customer Service</span>
-              <span className="text-xs">support@larchivesonore.com</span>
-            </li>
-            <li>
-              <span className="block font-medium">Hours</span>
-              <span className="text-xs">Mon - Fri: 9:00 AM - 6:00 PM EST</span>
-            </li>
-          </ul>
+        <div className="space-y-2 text-xs">
+          <h4 className="font-bold text-sage-primary uppercase tracking-wider">Call Us</h4>
+          <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+            +62 812 3456 789
+          </p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl border-t border-gray-200 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4">
-        <p>&copy; {new Date().getFullYear()} L&apos;Archive Sonore. All rights reserved.</p>
-        <div className="flex gap-4">
-          <span className="hover:underline cursor-pointer">Privacy Policy</span>
-          <span className="hover:underline cursor-pointer">Terms of Service</span>
+      {/* Dotted Divider */}
+      <div className="mx-auto max-w-[96%] px-4 border-t border-dotted border-sage-primary/30 my-6"></div>
+
+      {/* Metadata links row */}
+      <div className="mx-auto max-w-[96%] px-4 flex flex-wrap justify-between items-center text-[10px] tracking-widest text-sage-primary/80 uppercase mb-8 gap-4 font-light">
+        <span>L&apos;Archive Sonore</span>
+        <span>&copy; 2026</span>
+        <div className="flex gap-8">
+          <span className="hover:text-white cursor-pointer transition">Return Policy</span>
+          <span className="hover:text-white cursor-pointer transition">Terms of Use</span>
+        </div>
+      </div>
+
+      {/* Bottom Image Banner */}
+      <div className="mx-auto max-w-[96%]">
+        <div className="relative w-full overflow-hidden bg-transparent">
+          {/* Background Image */}
+          <img
+            src="/gambar%20footer%202b.png"
+            alt="L'Archive Sonore Footer Background"
+            className="w-full h-auto block opacity-90 brightness-[0.85] contrast-[1.05]"
+          />
+          {/* Text Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center p-4 bg-black/10">
+            <h2 className="text-white text-[9.5vw] font-medium tracking-wide text-center uppercase font-clash leading-none whitespace-nowrap scale-y-145 origin-center mt-35 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+              L&apos;Archive Sonore
+            </h2>
+          </div>
         </div>
       </div>
     </footer>

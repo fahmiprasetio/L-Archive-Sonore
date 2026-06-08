@@ -38,7 +38,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
           <button
             onClick={() => addItem(product)}
-            className="rounded bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-800 transition"
+            className="rounded bg-sage-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-sage-secondary transition duration-200"
           >
             Add to Cart
           </button>

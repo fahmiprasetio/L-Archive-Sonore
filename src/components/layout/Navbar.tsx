@@ -38,7 +38,7 @@ export default function Navbar() {
           <Link href="/cart" className="relative flex items-center gap-1 text-neutral-600 hover:text-neutral-900">
             <ShoppingCart className="h-6 w-6" />
             {totalItems > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-xs font-medium text-white">
+              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-sage-primary text-xs font-medium text-white">
                 {totalItems}
               </span>
             )}
