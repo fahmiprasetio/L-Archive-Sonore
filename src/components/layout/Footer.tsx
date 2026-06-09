@@ -1,66 +1,133 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+
 export default function Footer() {
+  const footerOuterRef = useRef<HTMLElement>(null);
+  const footerContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (footerOuterRef.current && footerContentRef.current) {
+            const rect = footerOuterRef.current.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            const scrollY = window.scrollY;
+            const footerOffsetTop = rect.top + scrollY;
+            const startScroll = footerOffsetTop - viewportHeight;
+            const maxScroll = document.documentElement.scrollHeight - viewportHeight;
+
+            if (scrollY > startScroll) {
+              const range = maxScroll - startScroll;
+              const progress = range > 0 ? Math.min(1, (scrollY - startScroll) / range) : 1;
+
+              // Max translation is -150px.
+              const translateY = -progress * 150;
+              footerContentRef.current.style.transform = `translateY(${translateY}px)`;
+            } else {
+              footerContentRef.current.style.transform = 'translateY(0px)';
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Initial check
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <footer className="w-full bg-black text-sage-secondary pt-16 pb-8 mt-16 select-none font-sans">
-      {/* Top Section: Info Grid */}
-      <div className="mx-auto max-w-[96%] px-4 grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
-        {/* Left Big Text */}
-        <div className="md:col-span-2 space-y-4">
-          <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-sage-primary leading-snug uppercase">
-            An e-commerce platform dedicated to premium musical gear, refined aesthetics, and classic sound archiving.
-          </h3>
-        </div>
-
-        {/* Right Columns */}
-        <div className="space-y-2 text-xs">
-          <h4 className="font-bold text-sage-primary uppercase tracking-wider">Address</h4>
-          <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
-            Sound Avenue 42,<br />
-            Jakarta, Indonesia
-          </p>
-        </div>
-
-        <div className="space-y-2 text-xs">
-          <h4 className="font-bold text-sage-primary uppercase tracking-wider">New Projects</h4>
-          <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
-            hello@larchivesonore.com
-          </p>
-        </div>
-
-        <div className="space-y-2 text-xs">
-          <h4 className="font-bold text-sage-primary uppercase tracking-wider">Call Us</h4>
-          <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
-            +62 812 3456 789
-          </p>
-        </div>
-      </div>
-
-      {/* Dotted Divider */}
-      <div className="mx-auto max-w-[96%] px-4 border-t border-dotted border-sage-primary/30 my-6"></div>
-
-      {/* Metadata links row */}
-      <div className="mx-auto max-w-[96%] px-4 flex flex-wrap justify-between items-center text-[10px] tracking-widest text-sage-primary/80 uppercase mb-8 gap-4 font-light">
-        <span>L&apos;Archive Sonore</span>
-        <span>&copy; 2026</span>
-        <div className="flex gap-8">
-          <span className="hover:text-white cursor-pointer transition">Return Policy</span>
-          <span className="hover:text-white cursor-pointer transition">Terms of Use</span>
-        </div>
-      </div>
-
-      {/* Bottom Image Banner */}
-      <div className="mx-auto max-w-[96%]">
-        <div className="relative w-full overflow-hidden bg-transparent">
-          {/* Background Image */}
+    <footer
+      ref={footerOuterRef}
+      className="w-full bg-black text-sage-secondary select-none font-sans relative overflow-visible -mt-24 z-30"
+      style={{ marginBottom: '-150px' }}
+    >
+      {/* Parallax Content Wrapper */}
+      <div
+        ref={footerContentRef}
+        className="w-full transition-transform duration-75 ease-out will-change-transform"
+      >
+        {/* Cloud Transition Asset */}
+        <div className="relative z-40 w-full pointer-events-none select-none -translate-y-[45%]">
           <img
-            src="/gambar%20footer.png"
-            alt="L'Archive Sonore Footer Background"
-            className="w-full h-auto block opacity-90 brightness-[0.85] contrast-[1.05]"
+            src="/transisi_awan_2.png"
+            alt="Cloud Transition Footer"
+            className="w-full h-auto block"
           />
-          {/* Text Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center p-4 bg-black/10">
-            <h2 className="text-white text-[10.09vw] font-normal tracking-normal text-center uppercase font-clash leading-none whitespace-nowrap scale-y-115 origin-center mt-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
-              L&apos;Archive Sonore
-            </h2>
+        </div>
+
+        {/* Footer Content */}
+        <div className="-mt-[25%] pb-8">          {/* Top Section: Info Grid */}
+          <div className="mx-auto max-w-[96%] px-4 grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
+            {/* Left Big Text */}
+            <div className="md:col-span-2 space-y-4">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-sage-primary leading-snug uppercase">
+                An e-commerce platform dedicated to premium musical gear, refined aesthetics, and classic sound archiving.
+              </h3>
+            </div>
+
+            {/* Right Columns */}
+            <div className="space-y-2 text-xs">
+              <h4 className="font-bold text-sage-primary uppercase tracking-wider">Address</h4>
+              <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+                Sound Avenue 42,<br />
+                Jakarta, Indonesia
+              </p>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <h4 className="font-bold text-sage-primary uppercase tracking-wider">New Projects</h4>
+              <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+                hello@larchivesonore.com
+              </p>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <h4 className="font-bold text-sage-primary uppercase tracking-wider">Call Us</h4>
+              <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+                +62 812 3456 789
+              </p>
+            </div>
+          </div>
+
+          {/* Dotted Divider */}
+          <div className="mx-auto max-w-[96%] px-4 border-t border-dotted border-sage-primary/30 my-6"></div>
+
+          {/* Metadata links row */}
+          <div className="mx-auto max-w-[96%] px-4 flex flex-wrap justify-between items-center text-[10px] tracking-widest text-sage-primary/80 uppercase mb-8 gap-4 font-light">
+            <span>L&apos;Archive Sonore</span>
+            <span>&copy; 2026</span>
+            <div className="flex gap-8">
+              <span className="hover:text-white cursor-pointer transition">Return Policy</span>
+              <span className="hover:text-white cursor-pointer transition">Terms of Use</span>
+            </div>
+          </div>
+
+          {/* Bottom Image Banner */}
+          <div className="mx-auto max-w-[96%]">
+            <div className="relative w-full overflow-hidden bg-transparent">
+              {/* Background Image */}
+              <img
+                src="/gambar%20footer.png"
+                alt="L'Archive Sonore Footer Background"
+                className="w-full h-auto block opacity-90 brightness-[0.85] contrast-[1.05]"
+              />
+              {/* Text Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center p-4 bg-black/10">
+                <h2 className="text-white text-[10.09vw] font-normal tracking-normal text-center uppercase font-clash leading-none whitespace-nowrap scale-y-115 origin-center mt-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+                  L&apos;Archive Sonore
+                </h2>
+              </div>
+            </div>
           </div>
         </div>
       </div>
