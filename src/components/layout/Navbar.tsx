@@ -83,6 +83,14 @@ export default function Navbar() {
 
         <div className="flex items-center gap-6">
           <Link
+            href="/shop"
+            className={`nav-link-underline font-clash uppercase tracking-wider text-xs md:text-sm font-semibold transition-colors duration-300 ${isTransparent ? 'text-white/90 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
+              }`}
+          >
+            Shop
+          </Link>
+
+          <Link
             href="/about"
             className={`nav-link-underline font-clash uppercase tracking-wider text-xs md:text-sm font-semibold transition-colors duration-300 ${isTransparent ? 'text-white/90 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
               }`}
