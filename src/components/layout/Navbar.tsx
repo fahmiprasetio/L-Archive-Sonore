@@ -38,15 +38,17 @@ export default function Navbar() {
     <header
       className={`fixed z-50 transition-all duration-500 ease-in-out ${isScrolled
           ? 'top-4 left-6 bg-black/80 backdrop-blur-md border border-white/10 py-2.5 px-5 shadow-xl text-white'
-          : 'top-0 left-0 bg-transparent border-transparent py-5 text-current'
+          : isOpen
+            ? 'top-0 left-0 bg-black/95 backdrop-blur-md border-b border-white/10 py-5 px-6 text-white'
+            : 'top-0 left-0 bg-transparent border-transparent py-5 text-current'
         }`}
       style={{
-        width: isScrolled ? '280px' : '100%',
+        width: isScrolled ? 'min(420px, calc(100vw - 3rem))' : '100%',
         borderRadius: isScrolled ? '15px' : '0px',
       }}
     >
       <div
-        className={`flex items-center justify-between transition-all duration-500 ${isScrolled ? 'gap-4' : 'mx-auto max-w-[95%] px-6'
+        className={`flex items-center justify-between w-full transition-all duration-500 ${isScrolled ? '' : 'mx-auto max-w-[95%] px-6'
           }`}
       >
         {/* Title */}
@@ -69,11 +71,11 @@ export default function Navbar() {
           aria-label="Toggle Menu"
         >
           <span
-            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isHome ? 'bg-white' : 'bg-neutral-900'
+            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isOpen || isHome ? 'bg-white' : 'bg-neutral-900'
               } ${isOpen ? 'w-5 rotate-45 translate-y-[4px]' : 'w-5'}`}
           ></span>
           <span
-            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isHome ? 'bg-white' : 'bg-neutral-900'
+            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isOpen || isHome ? 'bg-white' : 'bg-neutral-900'
               } ${isOpen ? 'w-5 -rotate-45 -translate-y-[4px]' : 'w-3'}`}
           ></span>
         </button>
@@ -82,8 +84,7 @@ export default function Navbar() {
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className={`absolute left-0 mt-3 bg-black/95 backdrop-blur-lg border border-white/10 rounded-2xl flex flex-col py-3 px-8 gap-1 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${isScrolled ? 'top-full w-64' : 'top-full right-0 left-0 mx-auto max-w-[95%]'
-            }`}
+          className="mt-3.5 border-t border-white/10 flex flex-col pt-1.5 gap-0.5 animate-in fade-in slide-in-from-top-2 duration-300 w-full"
         >
           {menuItems.map((item) => {
             const isActive = pathname === item.path;
@@ -91,16 +92,16 @@ export default function Navbar() {
               <Link
                 key={item.name}
                 href={item.path}
-                className={`group flex items-center justify-between py-3.5 border-b border-white/5 transition-all duration-300 ${isActive
+                className={`group flex items-center justify-between py-2.5 border-b border-white/5 transition-all duration-300 ${isActive
                     ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]'
                     : 'text-neutral-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.85)]'
                   }`}
               >
-                <span className="font-clash text-base uppercase tracking-widest font-semibold transition-all duration-300">
+                <span className="font-clash text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300">
                   {item.name}
                 </span>
                 <span
-                  className={`h-0.5 bg-white transition-all duration-300 ease-out ${isActive ? 'w-12' : 'w-0 group-hover:w-12'
+                  className={`h-0.5 bg-white transition-all duration-300 ease-out ${isActive ? 'w-8' : 'w-0 group-hover:w-8'
                     }`}
                 ></span>
               </Link>
