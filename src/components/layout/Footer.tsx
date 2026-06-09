@@ -58,7 +58,7 @@ export default function Footer() {
           />
           {/* Text Overlay */}
           <div className="absolute inset-0 flex items-center justify-center p-4 bg-black/10">
-            <h2 className="text-white text-[10vw] font-normal tracking-normal text-center uppercase font-clash leading-none whitespace-nowrap scale-y-105 origin-center mt-35 drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+            <h2 className="text-white text-[10.09vw] font-normal tracking-normal text-center uppercase font-clash leading-none whitespace-nowrap scale-y-115 origin-center mt-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
               L&apos;Archive Sonore
             </h2>
           </div>

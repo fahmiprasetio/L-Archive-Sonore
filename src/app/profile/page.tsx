@@ -2,12 +2,17 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, User, ShieldAlert } from 'lucide-react';
+import { useCartStore } from '@/store/cartStore';
+import { LogOut, User, ShieldAlert, ShoppingCart } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, loading, signOut, isMockMode } = useAuthStore();
   const router = useRouter();
+  
+  const items = useCartStore((state) => state.items);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -77,6 +82,21 @@ export default function ProfilePage() {
             <span className="col-span-2 text-neutral-900 font-medium">
               {isMockMode ? 'Mock Local Auth' : 'Live Supabase Auth'}
             </span>
+          </div>
+          <div className="grid grid-cols-3 gap-2 py-3 border-b border-gray-50 items-center">
+            <span className="text-neutral-500 font-medium">Shopping Cart</span>
+            <div className="col-span-2 flex items-center gap-3">
+              <span className="text-neutral-950 font-bold bg-neutral-100 px-2 py-1 rounded text-xs">
+                {totalItems} item{totalItems !== 1 ? 's' : ''}
+              </span>
+              <Link
+                href="/cart"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-neutral-950 text-white hover:bg-neutral-800 transition"
+              >
+                <ShoppingCart className="h-3 w-3" />
+                View Cart
+              </Link>
+            </div>
           </div>
         </div>
 

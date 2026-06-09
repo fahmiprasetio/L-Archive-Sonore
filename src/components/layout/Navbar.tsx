@@ -3,136 +3,112 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, User } from 'lucide-react';
-import { useCartStore } from '@/store/cartStore';
-import { useAuthStore } from '@/store/authStore';
 
 export default function Navbar() {
-  const items = useCartStore((state) => state.items);
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const { user, loading } = useAuthStore();
   const pathname = usePathname();
   const isHome = pathname === '/';
 
-  const [isVisible, setIsVisible] = useState(true);
-  const [isTransparent, setIsTransparent] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  // Check scroll position on mount or pathname change
-  useEffect(() => {
-    const checkScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (isHome && currentScrollY <= 50) {
-        setIsTransparent(true);
-      } else {
-        setIsTransparent(false);
-      }
-    };
-    checkScroll();
-  }, [isHome]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      // Transparent logic for homepage
-      if (isHome) {
-        if (currentScrollY <= 50) {
-          setIsTransparent(true);
-        } else if (currentScrollY < lastScrollY) {
-          setIsTransparent(false);
-        }
-      } else {
-        setIsTransparent(false);
-      }
-
-      // Hide/show logic based on scroll direction
-      if (currentScrollY <= 50) {
-        setIsVisible(true);
-      } else if (currentScrollY > lastScrollY) {
-        // Scrolling down -> hide navbar
-        setIsVisible(false);
-      } else {
-        // Scrolling up -> show navbar
-        setIsVisible(true);
-      }
-
-      setLastScrollY(currentScrollY);
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    // check initial scroll position
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, isHome]);
+  }, []);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  const menuItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Shop', path: '/shop' },
+    { name: 'About', path: '/about' },
+    { name: 'Profile', path: '/profile' },
+  ];
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-in-out ${isVisible ? 'translate-y-0' : '-translate-y-full'
-        } ${isTransparent
-          ? 'bg-transparent border-transparent text-white py-3'
-          : 'bg-white/90 backdrop-blur-md border-b border-neutral-200/80 text-neutral-900 py-3 shadow-sm'
+      className={`fixed z-50 transition-all duration-500 ease-in-out ${isScrolled
+          ? 'top-4 left-6 bg-black/80 backdrop-blur-md border border-white/10 py-2.5 px-5 shadow-xl text-white'
+          : 'top-0 left-0 bg-transparent border-transparent py-5 text-current'
         }`}
+      style={{
+        width: isScrolled ? '280px' : '100%',
+        borderRadius: isScrolled ? '15px' : '0px',
+      }}
     >
-      <div className="mx-auto flex max-w-95vw items-center justify-between px-6">
+      <div
+        className={`flex items-center justify-between transition-all duration-500 ${isScrolled ? 'gap-4' : 'mx-auto max-w-[95%] px-6'
+          }`}
+      >
+        {/* Title */}
         <Link
           href="/"
-          className={`flex items-center gap-2 text-lg sm:text-xl font-bold tracking-widest font-clash uppercase transition-colors duration-300 ${isTransparent ? 'text-white' : 'text-neutral-900'
+          className={`font-bold tracking-widest font-clash uppercase transition-all duration-300 whitespace-nowrap ${isScrolled
+              ? 'text-white text-sm sm:text-base hover:opacity-85'
+              : isHome
+                ? 'text-white text-lg sm:text-xl hover:text-white/80'
+                : 'text-neutral-900 text-lg sm:text-xl hover:text-neutral-700'
             }`}
         >
           L&apos;Archive Sonore
         </Link>
 
-        <div className="flex items-center gap-6">
-          <Link
-            href="/shop"
-            className={`nav-link-underline font-clash uppercase tracking-wider text-xs md:text-sm font-semibold transition-colors duration-300 ${isTransparent ? 'text-white/90 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
-              }`}
-          >
-            Shop
-          </Link>
-
-          <Link
-            href="/about"
-            className={`nav-link-underline font-clash uppercase tracking-wider text-xs md:text-sm font-semibold transition-colors duration-300 ${isTransparent ? 'text-white/90 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
-              }`}
-          >
-            About
-          </Link>
-
-          {!loading && user ? (
-            <Link
-              href="/profile"
-              className={`nav-link-underline flex items-center gap-1.5 font-clash uppercase tracking-wider text-xs md:text-sm font-semibold transition-colors duration-300 ${isTransparent ? 'text-white/90 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-            >
-              <User className="h-4 w-4" />
-              Profile
-            </Link>
-          ) : !loading ? (
-            <Link
-              href="/signin"
-              className={`nav-link-underline font-clash uppercase tracking-wider text-xs md:text-sm font-semibold transition-colors duration-300 ${isTransparent ? 'text-white/90 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-            >
-              Sign In
-            </Link>
-          ) : (
-            <span className="text-xs md:text-sm text-neutral-400">...</span>
-          )}
-
-          <Link
-            href="/cart"
-            className={`relative flex items-center gap-1 transition-colors duration-300 ${isTransparent ? 'text-white/90 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
-              }`}
-          >
-            <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
-            {totalItems > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-sage-primary text-[10px] font-bold text-white shadow-sm">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-        </div>
+        {/* Hamburger Menu Trigger */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative flex flex-col justify-center items-end gap-1.5 w-8 h-8 cursor-pointer focus:outline-none"
+          aria-label="Toggle Menu"
+        >
+          <span
+            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isHome ? 'bg-white' : 'bg-neutral-900'
+              } ${isOpen ? 'w-5 rotate-45 translate-y-[4px]' : 'w-5'}`}
+          ></span>
+          <span
+            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isHome ? 'bg-white' : 'bg-neutral-900'
+              } ${isOpen ? 'w-5 -rotate-45 -translate-y-[4px]' : 'w-3'}`}
+          ></span>
+        </button>
       </div>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div
+          className={`absolute left-0 mt-3 bg-black/95 backdrop-blur-lg border border-white/10 rounded-2xl flex flex-col py-3 px-8 gap-1 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${isScrolled ? 'top-full w-64' : 'top-full right-0 left-0 mx-auto max-w-[95%]'
+            }`}
+        >
+          {menuItems.map((item) => {
+            const isActive = pathname === item.path;
+            return (
+              <Link
+                key={item.name}
+                href={item.path}
+                className={`group flex items-center justify-between py-3.5 border-b border-white/5 transition-all duration-300 ${isActive
+                    ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]'
+                    : 'text-neutral-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.85)]'
+                  }`}
+              >
+                <span className="font-clash text-base uppercase tracking-widest font-semibold transition-all duration-300">
+                  {item.name}
+                </span>
+                <span
+                  className={`h-0.5 bg-white transition-all duration-300 ease-out ${isActive ? 'w-12' : 'w-0 group-hover:w-12'
+                    }`}
+                ></span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </header>
   );
 }
+
