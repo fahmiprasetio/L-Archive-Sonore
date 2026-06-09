@@ -37,10 +37,10 @@ export default function Navbar() {
   return (
     <header
       className={`fixed z-50 transition-all duration-500 ease-in-out ${isScrolled
-          ? 'top-4 left-6 bg-black/80 backdrop-blur-md border border-white/10 py-2.5 px-5 shadow-xl text-white'
-          : isOpen
-            ? 'top-0 left-0 bg-black/95 backdrop-blur-md border-b border-white/10 py-5 px-6 text-white'
-            : 'top-0 left-0 bg-transparent border-transparent py-5 text-current'
+        ? 'top-4 left-6 bg-black/40 backdrop-blur-sm border border-white/10 py-2.5 px-5 shadow-xl text-white'
+        : isOpen
+          ? 'top-0 left-0 bg-black/5 backdrop-blur-md border-b border-white/10 py-5 px-6 text-white'
+          : 'top-0 left-0 bg-transparent border-transparent py-5 text-current'
         }`}
       style={{
         width: isScrolled ? 'min(420px, calc(100vw - 3rem))' : '100%',
@@ -55,10 +55,10 @@ export default function Navbar() {
         <Link
           href="/"
           className={`font-bold tracking-widest font-clash uppercase transition-all duration-300 whitespace-nowrap ${isScrolled
-              ? 'text-white text-sm sm:text-base hover:opacity-85'
-              : isHome
-                ? 'text-white text-lg sm:text-xl hover:text-white/80'
-                : 'text-neutral-900 text-lg sm:text-xl hover:text-neutral-700'
+            ? 'text-white text-sm sm:text-base hover:opacity-85'
+            : isHome
+              ? 'text-white text-lg sm:text-xl hover:text-white/80'
+              : 'text-neutral-900 text-lg sm:text-xl hover:text-neutral-700'
             }`}
         >
           L&apos;Archive Sonore
@@ -93,16 +93,15 @@ export default function Navbar() {
                 key={item.name}
                 href={item.path}
                 className={`group flex items-center justify-between py-2.5 border-b border-white/5 transition-all duration-300 ${isActive
-                    ? 'text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]'
-                    : 'text-neutral-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.85)]'
+                  ? 'text-white'
+                  : 'text-neutral-400 hover:text-white'
                   }`}
               >
                 <span className="font-clash text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300">
                   {item.name}
                 </span>
                 <span
-                  className={`h-0.5 bg-white transition-all duration-300 ease-out ${isActive ? 'w-8' : 'w-0 group-hover:w-8'
-                    }`}
+                  className="h-0.5 bg-white transition-all duration-300 ease-out w-0 group-hover:w-50"
                 ></span>
               </Link>
             );
