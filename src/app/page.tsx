@@ -63,7 +63,7 @@ export default function Home() {
 
         {/* Section merah — z-10, di belakang awan */}
         <div className="relative z-10 bg-[#441004] w-full text-white pb-[36rem] -mt-[12%]">
-          <section id="featured" className="max-w-6xl mx-auto px-6 py-20 space-y-10">
+          <section id="featured" className="max-w-6xl mx-auto px-6 pt-64 pb-20 space-y-10">
             <div className="border-b border-white/20 pb-6">
               <h2 className="text-3xl font-bold tracking-widest text-white font-clash uppercase">
                 Featured Instruments
