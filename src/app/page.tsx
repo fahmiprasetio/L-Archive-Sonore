@@ -61,12 +61,13 @@ export default function Home() {
         style={{ backgroundImage: "url('/HERO_SECTION.png')", aspectRatio: "1280/806" }}
       >
         {/* Content */}
-        <div className="relative z-10 max-w-4xl px-4 sm:px-6 flex flex-col items-center justify-center">
+        <div className="relative z-10 max-w-4xl px-4 sm:px-6 flex flex-col items-center justify-center mt-15">
+
           <h1 className="flex flex-col items-center text-center">
-            <span className="font-cormorant italic font-light text-white text-3xl sm:text-5xl md:text-6xl lg:text-8xl tracking-normal capitalize drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]">
+            <span className="font-cormorant italic font-light text-white text-3xl sm:text-5xl md:text-6xl lg:text-6xl tracking-normal capitalize drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]">
               L&apos;Archive
             </span>
-            <span className="font-clash font-medium text-white text-7xl sm:text-6xl md:text-7xl lg:text-8xl tracking-normal uppercase mt-2vh sm:mt-[-16px] md:mt-[-20px] -lg:mt-0.7 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+            <span className="font-clash font-medium text-white text-7xl sm:text-6xl md:text-7xl lg:text-6xl tracking-normal uppercase mt-2vh sm:mt-[-16px] md:mt-[-20px] lg:mt-0 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
               Sonore
             </span>
           </h1>
