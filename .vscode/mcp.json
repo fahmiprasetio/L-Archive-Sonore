@@ -1,0 +1,17 @@
+{
+  "servers": {
+    "repo-filesystem": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"]
+    },
+    "notion": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_TOKEN": "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"
+      }
+    }
+  }
+}

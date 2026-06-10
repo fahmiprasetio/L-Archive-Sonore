@@ -112,7 +112,23 @@ export default function Home() {
 
         {/* Section merah — z-10, di belakang awan */}
         <div className="relative z-10 bg-[#441004] w-full text-white pb-[36rem] -mt-[12%]">
-          <section id="featured" className="max-w-6xl mx-auto px-6 pt-64 pb-20 space-y-10">
+          {/* Brand Intro Callout Section */}
+          <div className="max-w-4xl mx-auto px-6 pt-64 pb-24 text-center flex flex-col items-center justify-center space-y-8 select-none">
+            <h2 className="font-clash font-medium text-white text-3xl sm:text-4xl md:text-5xl uppercase tracking-widest leading-none">
+              L&apos;Archive Sonore
+            </h2>
+            <p className="font-cormorant italic font-light text-white text-3xl sm:text-4xl md:text-5xl max-w-[28rem] sm:max-w-[36rem] md:max-w-[46rem] leading-tight select-text">
+              where timeless instruments find their next definitive chapter.
+            </p>
+            <a
+              href="#featured"
+              className="inline-block mt-4 px-8 py-3 border border-white/20 hover:border-white rounded-full text-[9px] tracking-widest uppercase text-white/90 hover:text-white transition duration-300 font-sans"
+            >
+              Explore Instruments
+            </a>
+          </div>
+
+          <section id="featured" className="max-w-6xl mx-auto px-6 pt-16 pb-20 space-y-10">
             <div className="border-b border-white/20 pb-6">
               <h2 className="text-3xl font-bold tracking-widest text-white font-clash uppercase">
                 Featured Instruments
