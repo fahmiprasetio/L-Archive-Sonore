@@ -1,13 +1,27 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const footerOuterRef = useRef<HTMLElement>(null);
   const footerContentRef = useRef<HTMLDivElement>(null);
   const cloudRef = useRef<HTMLDivElement>(null);
 
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+
   useEffect(() => {
+    if (!isHome) {
+      if (footerContentRef.current) {
+        footerContentRef.current.style.transform = '';
+      }
+      if (cloudRef.current) {
+        cloudRef.current.style.transform = '';
+      }
+      return;
+    }
+
     let ticking = false;
 
     const handleScroll = () => {
@@ -58,36 +72,40 @@ export default function Footer() {
       window.removeEventListener('resize', handleScroll);
       clearTimeout(timeout);
     };
-  }, []);
+  }, [isHome]);
 
   return (
     <footer
       ref={footerOuterRef}
-      className="w-full bg-black text-sage-secondary select-none font-sans relative overflow-visible -mt-24 z-50"
+      className={`w-full bg-black text-sage-secondary select-none font-sans relative overflow-visible z-50 ${
+        isHome ? '-mt-24' : 'mt-16'
+      }`}
     >
       {/* Cloud Transition Asset Wrapper for Parallax (height 0 to avoid blank layout space) */}
-      <div
-        ref={cloudRef}
-        className="w-full h-0 relative z-40 transition-transform duration-75 ease-out will-change-transform"
-      >
-        <div className="absolute top-0 left-0 w-full pointer-events-none select-none -translate-y-[100%]">
-          <img
-            src="/transisi_awan_3.png"
-            alt="Cloud Transition Footer"
-            className="w-full h-auto block"
-          />
+      {isHome && (
+        <div
+          ref={cloudRef}
+          className="w-full h-0 relative z-40 transition-transform duration-75 ease-out will-change-transform"
+        >
+          <div className="absolute top-0 left-0 w-full pointer-events-none select-none -translate-y-[100%]">
+            <img
+              src="/transisi_awan_3.png"
+              alt="Cloud Transition Footer"
+              className="w-full h-auto block"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Overflow-hidden wrapper to clip translated content and prevent page height expansion */}
-      <div className="w-full overflow-hidden">
+      <div className={isHome ? "w-full overflow-hidden" : "w-full"}>
         {/* Parallax Content Wrapper */}
         <div
           ref={footerContentRef}
           className="w-full transition-transform duration-75 ease-out will-change-transform pb-0"
         >
           {/* Footer Content: pt-24 provides clean spacing under the cloud */}
-          <div className="pt-24 pb-6">
+          <div className={isHome ? "pt-24 pb-6" : "pt-16 pb-8"}>
             {/* Top Section: Info Grid */}
             <div className="mx-auto max-w-[96%] px-4 grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
               <div className="md:col-span-2 space-y-4">
