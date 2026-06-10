@@ -13,8 +13,8 @@ export default function Home() {
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
           if (heroRef.current) {
-            const scrollY = window.scrollY;
             heroRef.current.style.transform = `translateY(${scrollY * 0.4}px)`;
           }
           ticking = false;
@@ -53,12 +53,61 @@ export default function Home() {
       {/* Wrapper: awan + section merah dalam satu stacking context */}
       <div className="relative -mt-[30%]">
         {/* Awan — z-20 supaya di depan section merah */}
-        <div className="relative z-20 w-full pointer-events-none select-none">
+        <div className="relative z-20 w-full select-none">
           <img
             src="/transisi_awan_1.png"
             alt="Cloud Transition"
-            className="w-full h-auto block"
+            className="w-full h-auto block pointer-events-none"
           />
+
+          {/* Parallax Overlay on top of Awan 1 */}
+          <div
+            className="absolute bottom-[10%] left-0 w-full px-12 flex justify-between items-center text-white z-30 font-serif text-[11px] tracking-widest uppercase select-none"
+          >
+            {/* Left: Socials & Privacy */}
+            <div className="flex items-center gap-6">
+              <div className="flex gap-4 items-center text-white/80">
+                <a href="#" className="hover:text-white transition-colors">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M9 8H7v3h2v9h3v-9h2.72l.42-3H12V6.64c0-.88.24-1.48 1.5-1.48H15V2.35C14.73 2.3 13.8 2 12.7 2 10.4 2 8.8 3.4 8.8 6v2z"/>
+                  </svg>
+                </a>
+                <a href="#" className="hover:text-white transition-colors">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                  </svg>
+                </a>
+                <a href="#" className="hover:text-white transition-colors">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </a>
+              </div>
+              <a href="/privacy" className="hover:text-neutral-300 transition-colors font-serif tracking-widest">
+                Privacy Policy
+              </a>
+            </div>
+
+            {/* Right: Terms & Waves */}
+            <div className="flex items-center gap-8">
+              <a href="/terms" className="hover:text-neutral-300 transition-colors font-serif tracking-widest">
+                Terms of Service
+              </a>
+              <div className="flex gap-4 items-center text-white/80">
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <rect x="3" y="10" width="2" height="10" rx="0.5" />
+                  <rect x="8" y="4" width="2" height="16" rx="0.5" />
+                  <rect x="13" y="12" width="2" height="8" rx="0.5" />
+                  <rect x="18" y="7" width="2" height="13" rx="0.5" />
+                </svg>
+                <svg className="w-4.5 h-4.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M9 15c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" />
+                  <path d="M6 12c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Section merah — z-10, di belakang awan */}
