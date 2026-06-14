@@ -82,12 +82,12 @@ export default function ShopPage() {
     sortBy !== 'default';
 
   return (
-    <div className="relative w-full min-h-screen py-8 text-[#2E3A2C]">
-      {/* Full-bleed sage background */}
-      <div aria-hidden className="fixed inset-0 -z-10 bg-[#8A9A86]" />
+    <div className="relative w-full min-h-screen px-6 pt-24 pb-10 text-[#2E3A2C]">
+      {/* Full-bleed soft white background */}
+      <div aria-hidden className="fixed inset-0 -z-10 bg-[#F4F2EC]" />
 
-      {/* Hero section (taller — panel sage gelap, siap untuk gambar/aset overlay) */}
-      <div className="relative mb-10 flex min-h-[60vh] flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#3A4438] px-6 py-24 text-center">
+      {/* Hero section (taller — panel placeholder, siap untuk gambar/aset overlay) */}
+      <div className="relative mb-10 flex min-h-[60vh] flex-col items-center justify-center overflow-hidden rounded-2xl border border-black/5 bg-[#3A4438] px-6 py-24 text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wider text-white uppercase font-clash">
           The Archive Shop
         </h1>
@@ -97,8 +97,8 @@ export default function ShopPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">
-        {/* Desktop Sidebar (hidden on mobile/tablet, shown on lg screens) */}
-        <aside className="hidden lg:block w-80 flex-shrink-0 bg-white border border-neutral-200/80 rounded-xl p-6 shadow-sm sticky top-24">
+        {/* Desktop Sidebar — borderless, menyatu dengan latar, pepet kiri */}
+        <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-24 pr-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-clash text-lg font-semibold tracking-wider text-neutral-900 uppercase flex items-center gap-2">
               <SlidersHorizontal className="h-4.5 w-4.5 text-sage-primary" />
@@ -116,7 +116,7 @@ export default function ShopPage() {
           </div>
 
           {/* Category Filter */}
-          <div className="mb-6 pb-6 border-b border-neutral-100">
+          <div className="mb-6 pb-6 border-b border-black/10">
             <h3 className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 mb-3.5">
               Categories
             </h3>
@@ -139,7 +139,7 @@ export default function ShopPage() {
                         {category}
                       </span>
                     </div>
-                    <span className="text-xs bg-neutral-100 px-2 py-0.5 rounded-full text-neutral-500 group-hover:bg-neutral-200 group-hover:text-neutral-700 transition">
+                    <span className="text-xs bg-black/5 px-2 py-0.5 rounded-full text-neutral-500 group-hover:bg-black/10 group-hover:text-neutral-700 transition">
                       {categoryCounts[category]}
                     </span>
                   </label>
@@ -161,7 +161,7 @@ export default function ShopPage() {
                   placeholder="Min"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                  className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
                 />
               </div>
               <span className="text-neutral-400 text-sm">—</span>
@@ -172,7 +172,7 @@ export default function ShopPage() {
                   placeholder="Max"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                  className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
                 />
               </div>
             </div>
@@ -273,7 +273,7 @@ export default function ShopPage() {
         </div>
 
         {/* Shop Main Products Display Column */}
-        <div className="flex-grow w-full">
+        <div className="flex-grow w-full min-w-0">
           {/* Controls Bar: Search & Sort */}
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center mb-6 bg-white border border-neutral-200/80 rounded-xl p-4 shadow-sm">
             {/* Search Input */}
@@ -352,22 +352,22 @@ export default function ShopPage() {
           {sortedProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedProducts.map((product) => (
-                <ProductCard key={product.id} product={product} dark />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
             /* Empty State */
-            <div className="flex flex-col items-center justify-center text-center py-20 bg-black/20 backdrop-blur-md border border-white/10 rounded-xl shadow-sm px-6">
-              <SlidersHorizontal className="h-12 w-12 text-white/30 mb-4" />
-              <h3 className="font-clash text-lg font-semibold text-white uppercase tracking-wider">
+            <div className="flex flex-col items-center justify-center text-center py-20 bg-white border border-neutral-200/80 rounded-xl shadow-sm px-6">
+              <SlidersHorizontal className="h-12 w-12 text-neutral-300 mb-4" />
+              <h3 className="font-clash text-lg font-semibold text-neutral-900 uppercase tracking-wider">
                 No Instruments Found
               </h3>
-              <p className="text-sm text-white/60 mt-2 max-w-sm">
+              <p className="text-sm text-neutral-500 mt-2 max-w-sm">
                 We couldn&apos;t find any instruments matching your active filters. Try adjusting your search query, categories, or price range.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-[#EFE6D3] text-[#441004] rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-[#E5D8BD] transition cursor-pointer"
+                className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-sage-primary text-white rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-sage-secondary transition cursor-pointer"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Clear All Filters
