@@ -5,6 +5,7 @@ import { Search, SlidersHorizontal, RotateCcw, X, ChevronDown } from 'lucide-rea
 import type { Product } from '@/types';
 import { useProductStore } from '@/store/productStore';
 import ProductCard from '@/components/product/ProductCard';
+import ProductCardSkeleton from '@/components/product/ProductCardSkeleton';
 
 export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -351,8 +352,10 @@ export default function ShopPage() {
             </div>
 
             {!loaded ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center text-neutral-400">
-                <p className="text-sm font-semibold uppercase tracking-wider">Loading instruments...</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
               </div>
             ) : sortedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

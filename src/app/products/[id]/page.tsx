@@ -9,6 +9,7 @@ import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
 import { toast } from '@/store/toastStore';
 import WishlistButton from '@/components/product/WishlistButton';
 import ProductReviews from '@/components/product/ProductReviews';
+import ProductDetailSkeleton from '@/components/product/ProductDetailSkeleton';
 import type { Product } from '@/types';
 
 interface PageProps {
@@ -59,11 +60,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   if (!product) {
     if (!loaded) {
-      return (
-        <div className="py-12 text-center text-neutral-500">
-          <p className="text-lg font-medium">Loading product...</p>
-        </div>
-      );
+      return <ProductDetailSkeleton />;
     }
     return (
       <div className="py-12 text-center">
