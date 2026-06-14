@@ -12,6 +12,7 @@ const EMPTY_FORM: ProductInput = {
   price: 0,
   image_url: '',
   category: '',
+  stock: 0,
 };
 
 export default function AdminProductsPage() {
@@ -60,6 +61,7 @@ export default function AdminProductsPage() {
       price: p.price,
       image_url: p.image_url,
       category: p.category,
+      stock: p.stock ?? 0,
     });
     setShowForm(true);
   };
@@ -184,6 +186,16 @@ export default function AdminProductsPage() {
               />
             </div>
             <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-500">Stock</label>
+              <input
+                type="number"
+                min={0}
+                value={form.stock ?? 0}
+                onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
+                className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sage-primary"
+              />
+            </div>
+            <div>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-500">Image URL</label>
               <input
                 value={form.image_url}
@@ -223,59 +235,74 @@ export default function AdminProductsPage() {
                 <th className="px-4 py-3 font-semibold">Product</th>
                 <th className="px-4 py-3 font-semibold">Category</th>
                 <th className="px-4 py-3 font-semibold">Price</th>
+                <th className="px-4 py-3 font-semibold">Stock</th>
                 <th className="px-4 py-3 text-right font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {loading && !loaded && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-neutral-400">
+                  <td colSpan={5} className="px-4 py-10 text-center text-neutral-400">
                     <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</span>
                   </td>
                 </tr>
               )}
               {loaded && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-neutral-400">
+                  <td colSpan={5} className="px-4 py-10 text-center text-neutral-400">
                     No products found.
                   </td>
                 </tr>
               )}
-              {filtered.map((p) => (
-                <tr key={p.id} className="hover:bg-neutral-50">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={p.image_url}
-                        alt={p.name}
-                        className="h-10 w-10 flex-shrink-0 rounded-md bg-neutral-100 object-cover"
-                      />
-                      <span className="font-medium text-neutral-900">{p.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-neutral-600">{p.category}</td>
-                  <td className="px-4 py-3 font-semibold text-neutral-900">{currency(p.price)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-1.5">
-                      <button
-                        onClick={() => openEdit(p)}
-                        className="rounded-md p-2 text-neutral-500 transition hover:bg-sage-primary/10 hover:text-sage-primary"
-                        aria-label="Edit"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p)}
-                        className="rounded-md p-2 text-neutral-500 transition hover:bg-red-50 hover:text-red-600"
-                        aria-label="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((p) => {
+                const stock = typeof p.stock === 'number' ? p.stock : null;
+                return (
+                  <tr key={p.id} className="hover:bg-neutral-50">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.image_url}
+                          alt={p.name}
+                          className="h-10 w-10 flex-shrink-0 rounded-md bg-neutral-100 object-cover"
+                        />
+                        <span className="font-medium text-neutral-900">{p.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-neutral-600">{p.category}</td>
+                    <td className="px-4 py-3 font-semibold text-neutral-900">{currency(p.price)}</td>
+                    <td className="px-4 py-3">
+                      {stock === null ? (
+                        <span className="text-neutral-400">—</span>
+                      ) : stock <= 0 ? (
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Sold out</span>
+                      ) : stock <= 3 ? (
+                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">{stock} left</span>
+                      ) : (
+                        <span className="text-neutral-700">{stock}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1.5">
+                        <button
+                          onClick={() => openEdit(p)}
+                          className="rounded-md p-2 text-neutral-500 transition hover:bg-sage-primary/10 hover:text-sage-primary"
+                          aria-label="Edit"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p)}
+                          className="rounded-md p-2 text-neutral-500 transition hover:bg-red-50 hover:text-red-600"
+                          aria-label="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -285,7 +312,7 @@ export default function AdminProductsPage() {
         {dbMode ? (
           <span className="inline-flex items-center gap-1.5 text-sage-primary"><Database className="h-3.5 w-3.5" /> Tersambung Supabase — perubahan tersimpan permanen.</span>
         ) : (
-          <span className="inline-flex items-center gap-1.5"><HardDrive className="h-3.5 w-3.5" /> Mode lokal (localStorage) — isi NEXT_PUBLIC_SUPABASE_URL & ANON_KEY untuk menyimpan ke Supabase.</span>
+          <span className="inline-flex items-center gap-1.5"><HardDrive className="h-3.5 w-3.5" /> Mode lokal (localStorage) — isi env Supabase untuk menyimpan ke server.</span>
         )}
       </div>
     </div>

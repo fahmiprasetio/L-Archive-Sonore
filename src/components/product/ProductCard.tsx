@@ -11,6 +11,8 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, dark = false }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
+  const soldOut = typeof product.stock === 'number' && product.stock <= 0;
+  const lowStock = typeof product.stock === 'number' && product.stock > 0 && product.stock <= 3;
 
   return (
     <div
@@ -27,13 +29,24 @@ export default function ProductCard({ product, dark = false }: ProductCardProps)
           }`}
         >
           {product.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={product.image_url}
               alt={product.name}
-              className="h-full w-full object-cover rounded"
+              className={`h-full w-full object-cover rounded ${soldOut ? 'opacity-50 grayscale' : ''}`}
             />
           ) : (
             <span>No Image</span>
+          )}
+          {soldOut && (
+            <span className="absolute top-2 left-2 rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              Sold Out
+            </span>
+          )}
+          {!soldOut && lowStock && (
+            <span className="absolute top-2 left-2 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              {product.stock} left
+            </span>
           )}
         </div>
       </Link>
@@ -49,13 +62,16 @@ export default function ProductCard({ product, dark = false }: ProductCardProps)
           </span>
           <button
             onClick={() => addItem(product)}
+            disabled={soldOut}
             className={`rounded px-3 py-1.5 text-xs font-semibold transition duration-200 ${
-              dark
+              soldOut
+                ? 'cursor-not-allowed bg-neutral-300 text-neutral-500'
+                : dark
                 ? 'bg-[#EFE6D3] text-[#441004] hover:bg-[#E5D8BD]'
                 : 'bg-sage-primary text-white hover:bg-sage-secondary'
             }`}
           >
-            Add to Cart
+            {soldOut ? 'Sold Out' : 'Add to Cart'}
           </button>
         </div>
       </div>

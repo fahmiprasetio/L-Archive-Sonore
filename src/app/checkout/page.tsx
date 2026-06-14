@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { ArrowLeft, CreditCard } from 'lucide-react';
 import Script from 'next/script';
 
@@ -38,11 +39,20 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (isSupabaseConfigured()) {
+        try {
+          const { data } = await supabase.auth.getSession();
+          const token = data.session?.access_token;
+          if (token) headers.Authorization = `Bearer ${token}`;
+        } catch {
+          // anonymous checkout
+        }
+      }
+
       const response = await fetch('/api/payment', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           items,
           customerDetails: formData,

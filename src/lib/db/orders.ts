@@ -9,6 +9,7 @@ export interface OrderItemSnapshot {
 
 export interface Order {
   id: string;
+  user_id?: string | null;
   customer_name: string;
   customer_email: string;
   customer_address?: string | null;
@@ -18,13 +19,32 @@ export interface Order {
   created_at: string;
 }
 
-const TABLE = 'orders';
+async function authHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {};
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (token) headers.Authorization = `Bearer ${token}`;
+  } catch {
+    // ignore
+  }
+  return headers;
+}
 
-export async function fetchOrdersDb(): Promise<Order[]> {
+// Pesanan milik user yang login (RLS membatasi ke auth.uid() = user_id).
+export async function fetchMyOrders(): Promise<Order[]> {
   const { data, error } = await supabase
-    .from(TABLE)
+    .from('orders')
     .select('*')
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []) as Order[];
+}
+
+// Semua pesanan — khusus admin, via server (service-role).
+export async function fetchAllOrdersAdmin(): Promise<Order[]> {
+  const res = await fetch('/api/admin/orders', { headers: await authHeaders() });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Gagal memuat pesanan');
+  return (json.orders || []) as Order[];
 }

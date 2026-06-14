@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { isAdminEmail } from '@/lib/admin';
-import { LogOut, User, ShieldAlert, ShoppingCart, LayoutDashboard } from 'lucide-react';
+import { LogOut, User, ShieldAlert, ShoppingCart, LayoutDashboard, Package } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, loading, signOut, isMockMode } = useAuthStore();
@@ -77,6 +77,22 @@ export default function ProfilePage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-sage-primary">Open &rarr;</span>
           </Link>
         )}
+
+        <Link
+          href="/orders"
+          className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-4 transition hover:bg-neutral-50"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <Package className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-neutral-900">My Orders</p>
+              <p className="text-xs text-neutral-500">Lihat riwayat &amp; status pesanan</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Open &rarr;</span>
+        </Link>
 
         <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
           <div className="h-16 w-16 rounded-full bg-neutral-900 flex items-center justify-center text-white">

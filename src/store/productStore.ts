@@ -80,6 +80,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
       const newProduct: Product = {
         ...input,
         id: `p_${Date.now()}`,
+        stock: input.stock ?? 0,
         created_at: new Date().toISOString(),
       };
       const products = [...get().products, newProduct];

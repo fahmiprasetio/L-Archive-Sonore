@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { isAdminEmail } from '@/lib/admin';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { fetchOrdersDb } from '@/lib/db/orders';
+import { fetchAllOrdersAdmin } from '@/lib/db/orders';
 import type { Order } from '@/lib/db/orders';
 import { Users, ShoppingBag, ShieldCheck } from 'lucide-react';
 
@@ -33,7 +33,7 @@ export default function AdminUsersPage() {
     (async () => {
       if (isSupabaseConfigured()) {
         try {
-          setOrders(await fetchOrdersDb());
+          setOrders(await fetchAllOrdersAdmin());
         } catch {
           // ignore
         }
@@ -67,7 +67,7 @@ export default function AdminUsersPage() {
 
         {!isMockMode && (
           <p className="px-6 py-4 text-sm text-neutral-500">
-            Auth aktif memakai Supabase. Daftar lengkap pengguna hanya bisa diambil dari sisi server memakai service-role key (tidak aman di browser). Kelola pengguna langsung di dashboard Supabase &rarr; Authentication &rarr; Users.
+            Auth aktif memakai Supabase. Daftar lengkap pengguna hanya bisa diambil dari sisi server memakai service-role key. Kelola pengguna langsung di dashboard Supabase &rarr; Authentication &rarr; Users.
           </p>
         )}
 
@@ -127,7 +127,7 @@ export default function AdminUsersPage() {
             <ShoppingBag className="h-10 w-10 text-neutral-300" />
             <p className="mt-3 text-sm font-medium text-neutral-600">Supabase belum terkonfigurasi</p>
             <p className="mt-1 max-w-md text-xs text-neutral-400">
-              Isi NEXT_PUBLIC_SUPABASE_URL & ANON_KEY dan jalankan supabase/schema.sql untuk mulai mencatat pesanan dari checkout.
+              Isi NEXT_PUBLIC_SUPABASE_URL, ANON_KEY, & SUPABASE_SERVICE_ROLE_KEY lalu jalankan supabase/schema.sql untuk mulai mencatat pesanan.
             </p>
           </div>
         ) : orders.length === 0 ? (

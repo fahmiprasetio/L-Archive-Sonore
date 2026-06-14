@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useProductStore } from '@/store/productStore';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { fetchOrdersDb } from '@/lib/db/orders';
-import { Package, Tags, DollarSign, Users, TrendingUp, ShoppingBag } from 'lucide-react';
+import { fetchAllOrdersAdmin } from '@/lib/db/orders';
+import { Package, Tags, DollarSign, Users, TrendingUp, ShoppingBag, AlertTriangle } from 'lucide-react';
 
 export default function AdminOverviewPage() {
   const products = useProductStore((s) => s.products);
@@ -23,7 +23,7 @@ export default function AdminOverviewPage() {
     (async () => {
       if (isSupabaseConfigured()) {
         try {
-          const orders = await fetchOrdersDb();
+          const orders = await fetchAllOrdersAdmin();
           setOrderCount(orders.length);
         } catch {
           // ignore
@@ -42,6 +42,7 @@ export default function AdminOverviewPage() {
 
   const totalValue = list.reduce((sum, p) => sum + p.price, 0);
   const avgPrice = list.length > 0 ? Math.round(totalValue / list.length) : 0;
+  const outOfStock = list.filter((p) => typeof p.stock === 'number' && p.stock <= 0).length;
 
   const currency = (n: number) => '$' + n.toLocaleString('en-US');
 
@@ -50,13 +51,14 @@ export default function AdminOverviewPage() {
     { label: 'Categories', value: categories.length.toString(), icon: Tags },
     { label: 'Inventory Value', value: currency(totalValue), icon: DollarSign },
     { label: 'Avg. Price', value: currency(avgPrice), icon: TrendingUp },
+    { label: 'Out of Stock', value: outOfStock.toString(), icon: AlertTriangle },
     { label: 'Orders', value: orderCount.toString(), icon: ShoppingBag },
     { label: 'Registered Users', value: userCount.toString(), icon: Users },
   ];
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {stats.map((s) => {
           const Icon = s.icon;
           return (

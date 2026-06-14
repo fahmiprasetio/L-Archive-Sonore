@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { snap } from '@/lib/midtrans';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getUserFromRequest } from '@/lib/server-auth';
 import { CartItem } from '@/types';
+
+export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
@@ -55,11 +58,13 @@ export async function POST(request: Request) {
     // Call Midtrans Snap API to get transaction token and redirect url
     const transaction = await snap.createTransaction(parameter);
 
-    // Catat order ke Supabase (status pending) bila Supabase terkonfigurasi.
-    if (supabase) {
+    // Catat order (status pending) memakai service-role. user_id diisi bila login.
+    if (supabaseAdmin) {
       try {
-        await supabase.from('orders').insert({
+        const user = await getUserFromRequest(request);
+        await supabaseAdmin.from('orders').insert({
           id: orderId,
+          user_id: user?.id ?? null,
           customer_name: customerDetails.name,
           customer_email: customerDetails.email,
           customer_address: customerDetails.address || '',
