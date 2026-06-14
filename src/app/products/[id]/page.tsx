@@ -1,11 +1,12 @@
 'use client';
 
-import { use, useEffect, useMemo } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Minus, Plus } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useProductStore } from '@/store/productStore';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
+import { toast } from '@/store/toastStore';
 import type { Product } from '@/types';
 
 interface PageProps {
@@ -22,6 +23,9 @@ export default function ProductDetailPage({ params }: PageProps) {
   const loaded = useProductStore((s) => s.loaded);
   const loadProducts = useProductStore((s) => s.loadProducts);
   const addItem = useCartStore((state) => state.addItem);
+  const items = useCartStore((state) => state.items);
+
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     loadProducts();
@@ -35,6 +39,21 @@ export default function ProductDetailPage({ params }: PageProps) {
     }
     return fromMock;
   }, [products, id]);
+
+  // Hitung ketersediaan stok (null = stok tidak diketahui / tak terbatas).
+  const stock = product && typeof product.stock === 'number' ? product.stock : null;
+  const inCart = product
+    ? items.find((i) => i.product.id === product.id)?.quantity ?? 0
+    : 0;
+  const soldOut = stock !== null && stock <= 0;
+  const maxAddable = stock !== null ? Math.max(0, stock - inCart) : null;
+  const maxSelectable = maxAddable === null ? 99 : maxAddable;
+  const canAdd = !!product && !soldOut && (maxAddable === null || maxAddable > 0);
+
+  // Jaga agar qty selalu valid ketika ketersediaan berubah.
+  useEffect(() => {
+    setQty((q) => Math.min(Math.max(1, q), Math.max(1, maxSelectable)));
+  }, [maxSelectable]);
 
   if (!product) {
     if (!loaded) {
@@ -55,6 +74,17 @@ export default function ProductDetailPage({ params }: PageProps) {
     );
   }
 
+  const handleAdd = () => {
+    if (!canAdd) return;
+    if (maxAddable !== null && qty > maxAddable) {
+      toast.error(`Only ${maxAddable} more available for this item`);
+      return;
+    }
+    addItem(product, qty);
+    toast.success(`Added ${qty} \u00d7 ${product.name} to cart`);
+    setQty(1);
+  };
+
   return (
     <div className="py-6 space-y-6">
       <Link href="/" className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition">
@@ -68,7 +98,7 @@ export default function ProductDetailPage({ params }: PageProps) {
             <img
               src={product.image_url}
               alt={product.name}
-              className="h-full w-full object-cover"
+              className={`h-full w-full object-cover ${soldOut ? 'opacity-50 grayscale' : ''}`}
             />
           ) : (
             <span>No Image</span>
@@ -102,19 +132,72 @@ export default function ProductDetailPage({ params }: PageProps) {
             )}
           </div>
 
-          <div className="pt-6 border-t border-gray-100 mt-6 flex items-center justify-between">
-            <div>
-              <span className="text-sm text-gray-500">Price</span>
-              <p className="text-3xl font-bold text-neutral-900">
-                ${product.price.toLocaleString('en-US')}
-              </p>
+          <div className="pt-6 border-t border-gray-100 mt-6 space-y-4">
+            <div className="flex items-end justify-between">
+              <div>
+                <span className="text-sm text-gray-500">Price</span>
+                <p className="text-3xl font-bold text-neutral-900">
+                  ${product.price.toLocaleString('en-US')}
+                </p>
+              </div>
+              <div className="text-right">
+                {soldOut ? (
+                  <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                    Out of stock
+                  </span>
+                ) : stock !== null && stock <= 3 ? (
+                  <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                    Only {stock} left
+                  </span>
+                ) : stock !== null ? (
+                  <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                    {stock} in stock
+                  </span>
+                ) : null}
+                {inCart > 0 && (
+                  <p className="mt-1 text-xs text-neutral-500">{inCart} already in cart</p>
+                )}
+              </div>
             </div>
-            <button
-              onClick={() => addItem(product)}
-              className="rounded bg-neutral-900 px-6 py-3 font-semibold text-white hover:bg-neutral-800 transition"
-            >
-              Add to Cart
-            </button>
+
+            <div className="flex items-center gap-4">
+              {/* Quantity stepper */}
+              <div className="flex items-center rounded-lg border border-gray-300">
+                <button
+                  type="button"
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  disabled={!canAdd || qty <= 1}
+                  className="flex h-11 w-11 items-center justify-center text-neutral-700 transition hover:bg-neutral-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="w-12 select-none text-center font-semibold text-neutral-900">
+                  {qty}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setQty((q) => Math.min(maxSelectable, q + 1))}
+                  disabled={!canAdd || qty >= maxSelectable}
+                  className="flex h-11 w-11 items-center justify-center text-neutral-700 transition hover:bg-neutral-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+
+              <button
+                onClick={handleAdd}
+                disabled={!canAdd}
+                className={`flex-1 rounded px-6 py-3 font-semibold text-white transition ${
+                  canAdd
+                    ? 'bg-neutral-900 hover:bg-neutral-800'
+                    : 'cursor-not-allowed bg-neutral-300 text-neutral-500'
+                }`}
+              >
+                {soldOut ? 'Sold Out' : maxAddable === 0 ? 'Max in cart' : 'Add to Cart'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
