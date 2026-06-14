@@ -7,6 +7,8 @@ import { useCartStore } from '@/store/cartStore';
 import { useProductStore } from '@/store/productStore';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
 import { toast } from '@/store/toastStore';
+import WishlistButton from '@/components/product/WishlistButton';
+import ProductReviews from '@/components/product/ProductReviews';
 import type { Product } from '@/types';
 
 interface PageProps {
@@ -197,10 +199,14 @@ export default function ProductDetailPage({ params }: PageProps) {
               >
                 {soldOut ? 'Sold Out' : maxAddable === 0 ? 'Max in cart' : 'Add to Cart'}
               </button>
+
+              <WishlistButton productId={product.id} productName={product.name} variant="button" />
             </div>
           </div>
         </div>
       </div>
+
+      <ProductReviews productId={product.id} productName={product.name} />
     </div>
   );
 }

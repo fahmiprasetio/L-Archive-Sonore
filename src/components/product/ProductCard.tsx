@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Product } from '@/types';
 import { useCartStore } from '@/store/cartStore';
+import WishlistButton from '@/components/product/WishlistButton';
 
 interface ProductCardProps {
   product: Product;
@@ -22,34 +23,39 @@ export default function ProductCard({ product, dark = false }: ProductCardProps)
           : 'border-gray-200 bg-white'
       }`}
     >
-      <Link href={`/products/${product.id}`} className="block">
-        <div
-          className={`relative mb-4 aspect-square w-full rounded flex items-center justify-center hover:opacity-90 transition overflow-hidden ${
-            dark ? 'bg-white/5 text-white/40' : 'bg-gray-100 text-gray-400'
-          }`}
-        >
-          {product.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className={`h-full w-full object-cover rounded ${soldOut ? 'opacity-50 grayscale' : ''}`}
-            />
-          ) : (
-            <span>No Image</span>
-          )}
-          {soldOut && (
-            <span className="absolute top-2 left-2 rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-              Sold Out
-            </span>
-          )}
-          {!soldOut && lowStock && (
-            <span className="absolute top-2 left-2 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-              {product.stock} left
-            </span>
-          )}
+      <div className="relative">
+        <Link href={`/products/${product.id}`} className="block">
+          <div
+            className={`relative mb-4 aspect-square w-full rounded flex items-center justify-center hover:opacity-90 transition overflow-hidden ${
+              dark ? 'bg-white/5 text-white/40' : 'bg-gray-100 text-gray-400'
+            }`}
+          >
+            {product.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className={`h-full w-full object-cover rounded ${soldOut ? 'opacity-50 grayscale' : ''}`}
+              />
+            ) : (
+              <span>No Image</span>
+            )}
+            {soldOut && (
+              <span className="absolute top-2 left-2 rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                Sold Out
+              </span>
+            )}
+            {!soldOut && lowStock && (
+              <span className="absolute top-2 left-2 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                {product.stock} left
+              </span>
+            )}
+          </div>
+        </Link>
+        <div className="absolute right-2 top-2 z-10">
+          <WishlistButton productId={product.id} productName={product.name} variant="overlay" />
         </div>
-      </Link>
+      </div>
       <div className="flex flex-1 flex-col">
         <span className={`text-xs uppercase tracking-wider ${dark ? 'text-white/50' : 'text-gray-500'}`}>{product.category}</span>
         <Link href={`/products/${product.id}`} className="hover:underline">

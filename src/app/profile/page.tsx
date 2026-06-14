@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useWishlistStore } from '@/store/wishlistStore';
 import { isAdminEmail } from '@/lib/admin';
 import {
   LogOut,
@@ -16,6 +17,7 @@ import {
   Mail,
   Fingerprint,
   ChevronRight,
+  Heart,
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -24,6 +26,7 @@ export default function ProfilePage() {
 
   const items = useCartStore((state) => state.items);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const wishlistCount = useWishlistStore((state) => state.ids.length);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -133,6 +136,22 @@ export default function ProfilePage() {
             <div>
               <p className="font-semibold text-neutral-900">My Orders</p>
               <p className="text-xs text-neutral-500">Riwayat &amp; status pesanan</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-neutral-400 transition group-hover:translate-x-1" />
+        </Link>
+
+        <Link
+          href="/wishlist"
+          className="group flex items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:bg-neutral-50"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-50 text-red-500">
+              <Heart className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-neutral-900">My Wishlist</p>
+              <p className="text-xs text-neutral-500">{wishlistCount} item{wishlistCount !== 1 ? 's' : ''} disimpan</p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 text-neutral-400 transition group-hover:translate-x-1" />
