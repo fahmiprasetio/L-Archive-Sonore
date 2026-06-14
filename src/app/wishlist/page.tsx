@@ -1,25 +1,28 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Heart, ArrowLeft } from 'lucide-react';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useProductStore } from '@/store/productStore';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
 import ProductCard from '@/components/product/ProductCard';
+import { toast } from '@/store/toastStore';
 import type { Product } from '@/types';
 
 export default function WishlistPage() {
   const ids = useWishlistStore((s) => s.ids);
+  const wlLoaded = useWishlistStore((s) => s.loaded);
   const clear = useWishlistStore((s) => s.clear);
+  const loadWishlist = useWishlistStore((s) => s.load);
   const products = useProductStore((s) => s.products);
+  const productsLoaded = useProductStore((s) => s.loaded);
   const loadProducts = useProductStore((s) => s.loadProducts);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    loadWishlist();
     loadProducts();
-  }, [loadProducts]);
+  }, [loadWishlist, loadProducts]);
 
   const saved = useMemo<Product[]>(() => {
     return ids
@@ -27,7 +30,16 @@ export default function WishlistPage() {
       .filter((p): p is Product => Boolean(p));
   }, [ids, products]);
 
-  if (!mounted) {
+  const handleClear = async () => {
+    try {
+      await clear();
+      toast.info('Wishlist cleared');
+    } catch {
+      toast.error('Failed to clear wishlist');
+    }
+  };
+
+  if (!wlLoaded || !productsLoaded) {
     return (
       <div className="py-12 text-center text-neutral-500">
         <p className="text-lg font-medium">Loading wishlist...</p>
@@ -50,7 +62,7 @@ export default function WishlistPage() {
         </h1>
         {saved.length > 0 && (
           <button
-            onClick={clear}
+            onClick={handleClear}
             className="text-sm font-semibold text-neutral-500 transition hover:text-red-600"
           >
             Clear all

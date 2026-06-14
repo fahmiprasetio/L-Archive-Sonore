@@ -71,3 +71,63 @@ create policy "orders_select_own" on public.orders
 
 create index if not exists orders_user_id_idx on public.orders (user_id);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
+
+-- =========================================================
+-- WISHLISTS (favorit per-user)
+-- =========================================================
+create table if not exists public.wishlists (
+  user_id uuid not null,
+  product_id text not null,
+  created_at timestamptz not null default now(),
+  primary key (user_id, product_id)
+);
+
+alter table public.wishlists enable row level security;
+
+-- User hanya boleh melihat & mengelola wishlist miliknya sendiri.
+drop policy if exists "wishlists_select_own" on public.wishlists;
+create policy "wishlists_select_own" on public.wishlists
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "wishlists_insert_own" on public.wishlists;
+create policy "wishlists_insert_own" on public.wishlists
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "wishlists_delete_own" on public.wishlists;
+create policy "wishlists_delete_own" on public.wishlists
+  for delete using (auth.uid() = user_id);
+
+create index if not exists wishlists_user_id_idx on public.wishlists (user_id);
+
+-- =========================================================
+-- REVIEWS (ulasan produk)
+-- =========================================================
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  product_id text not null,
+  user_id uuid not null,
+  author text not null default 'Anonymous',
+  rating integer not null check (rating >= 1 and rating <= 5),
+  comment text not null default '',
+  created_at timestamptz not null default now()
+);
+
+alter table public.reviews enable row level security;
+
+-- Ulasan bisa dibaca siapa saja (publik).
+drop policy if exists "reviews_select_public" on public.reviews;
+create policy "reviews_select_public" on public.reviews
+  for select using (true);
+
+-- User yang login hanya boleh menulis ulasan atas namanya sendiri.
+drop policy if exists "reviews_insert_own" on public.reviews;
+create policy "reviews_insert_own" on public.reviews
+  for insert with check (auth.uid() = user_id);
+
+-- User boleh menghapus ulasannya sendiri.
+drop policy if exists "reviews_delete_own" on public.reviews;
+create policy "reviews_delete_own" on public.reviews
+  for delete using (auth.uid() = user_id);
+
+create index if not exists reviews_product_id_idx on public.reviews (product_id);
+create index if not exists reviews_created_at_idx on public.reviews (created_at desc);
