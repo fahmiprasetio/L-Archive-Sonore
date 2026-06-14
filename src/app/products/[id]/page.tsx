@@ -9,6 +9,7 @@ import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
 import { toast } from '@/store/toastStore';
 import WishlistButton from '@/components/product/WishlistButton';
 import ProductReviews from '@/components/product/ProductReviews';
+import ProductCard from '@/components/product/ProductCard';
 import ProductDetailSkeleton from '@/components/product/ProductDetailSkeleton';
 import type { Product } from '@/types';
 
@@ -42,6 +43,19 @@ export default function ProductDetailPage({ params }: PageProps) {
     }
     return fromMock;
   }, [products, id]);
+
+  // Rekomendasi produk: kategori sama dulu, lalu isi sisanya dari produk lain.
+  const relatedProducts = useMemo(() => {
+    if (!product) return [] as Product[];
+    const pool = products.length > 0 ? products : MOCK_PRODUCTS;
+    const sameCategory = pool.filter(
+      (p) => p.id !== product.id && p.category === product.category
+    );
+    const others = pool.filter(
+      (p) => p.id !== product.id && p.category !== product.category
+    );
+    return [...sameCategory, ...others].slice(0, 4);
+  }, [products, product]);
 
   // Hitung ketersediaan stok (null = stok tidak diketahui / tak terbatas).
   const stock = product && typeof product.stock === 'number' ? product.stock : null;
@@ -202,6 +216,17 @@ export default function ProductDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {relatedProducts.length > 0 && (
+        <section className="pt-4">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-6">You May Also Like</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <ProductReviews productId={product.id} productName={product.name} />
     </div>
