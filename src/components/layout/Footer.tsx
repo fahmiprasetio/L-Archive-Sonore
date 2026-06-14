@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Footer() {
   const footerOuterRef = useRef<HTMLElement>(null);
@@ -147,8 +148,8 @@ export default function Footer() {
               <span>L&apos;Archive Sonore</span>
               <span>&copy; 2026</span>
               <div className="flex gap-8">
-                <span className="hover:text-white cursor-pointer transition">Return Policy</span>
-                <span className="hover:text-white cursor-pointer transition">Terms of Use</span>
+                <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
+                <Link href="/terms" className="hover:text-white transition">Terms of Use</Link>
               </div>
             </div>
 
