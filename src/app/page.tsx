@@ -5,6 +5,11 @@ import Link from 'next/link';
 import ProductCard from '@/components/product/ProductCard';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
 
+const heroStyle: React.CSSProperties = {
+  backgroundImage: "url('/HERO_SECTION.png')",
+  aspectRatio: '1280/806',
+};
+
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
 
@@ -34,10 +39,7 @@ export default function Home() {
       <section
         ref={heroRef}
         className="relative w-full flex flex-col items-center justify-center text-center overflow-hidden bg-cover bg-center z-0"
-        style=
-          backgroundImage: "url('/HERO_SECTION.png')",
-          aspectRatio: "1280/806",
-        
+        style={heroStyle}
       >
         <div className="relative z-10 max-w-4xl px-4 sm:px-6 flex flex-col items-center justify-center -mt-[15%]">
           <h1 className="flex flex-col items-center text-center">
