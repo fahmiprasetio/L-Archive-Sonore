@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import ProductCard from '@/components/product/ProductCard';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
 
@@ -33,10 +34,10 @@ export default function Home() {
       <section
         ref={heroRef}
         className="relative w-full flex flex-col items-center justify-center text-center overflow-hidden bg-cover bg-center z-0"
-        style={{
+        style=
           backgroundImage: "url('/HERO_SECTION.png')",
           aspectRatio: "1280/806",
-        }}
+        
       >
         <div className="relative z-10 max-w-4xl px-4 sm:px-6 flex flex-col items-center justify-center -mt-[15%]">
           <h1 className="flex flex-col items-center text-center">
@@ -138,10 +139,25 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {MOCK_PRODUCTS.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+            {/* Carousel — scroll ke samping, hanya 5 barang */}
+            <div className="-mx-6 px-6 overflow-x-auto pb-4 [scrollbar-width:thin]">
+              <div className="flex gap-6 snap-x snap-mandatory">
+                {MOCK_PRODUCTS.slice(0, 5).map((product) => (
+                  <div key={product.id} className="snap-start shrink-0 w-72">
+                    <ProductCard product={product} dark />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tombol ke halaman shop (semua barang) */}
+            <div className="flex justify-center pt-2">
+              <Link
+                href="/shop"
+                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-10 py-3 text-[10px] tracking-widest uppercase text-white/90 hover:bg-white hover:text-[#441004] transition duration-300 font-sans"
+              >
+                View All Instruments &rarr;
+              </Link>
             </div>
           </section>
         </div>

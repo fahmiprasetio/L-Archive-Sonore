@@ -1,95 +1,167 @@
 import Link from 'next/link';
-import { Music, Award, ShieldCheck, Heart } from 'lucide-react';
+import { Music, Award, ShieldCheck, Heart, ArrowRight } from 'lucide-react';
+
+const heroBg = {
+  backgroundImage:
+    "url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1600')",
+};
+
+const storyBg = {
+  backgroundImage:
+    "url('https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&q=80&w=1000')",
+};
+
+const stats = [
+  { value: 'Est. 2026', label: 'Founded' },
+  { value: '6+', label: 'Categories' },
+  { value: '100%', label: 'Curated & Inspected' },
+  { value: 'Global', label: 'Safe Transit' },
+];
+
+const values = [
+  {
+    icon: Music,
+    title: 'Curated Selection',
+    desc: 'Only the most historically significant and premium instruments make it into our archive.',
+  },
+  {
+    icon: Award,
+    title: 'Elite Quality',
+    desc: 'Strictly inspected and set up by certified luthiers and audio specialists.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Secure Custody',
+    desc: 'Protected checkout and global safe transit for every premium item.',
+  },
+  {
+    icon: Heart,
+    title: 'For True Creators',
+    desc: 'A community built upon a shared passion for music-making and design.',
+  },
+];
 
 export default function AboutPage() {
   return (
-    <div className="py-6 space-y-12 max-w-4xl mx-auto">
-      {/* Title */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900 sm:text-5xl">
-          About L&apos;Archive Sonore
-        </h1>
-        <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-          The sanctuary for handpicked, premium, and legendary musical instruments curated for true sound artisans.
-        </p>
-      </div>
-
-      {/* Hero Image / Design */}
-      <div className="aspect-[21/9] w-full rounded-lg bg-neutral-900 flex items-center justify-center text-white overflow-hidden relative border border-neutral-800">
-        <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1200')" }} />
-        <div className="relative z-10 text-center px-4 space-y-2">
-          <p className="text-xs uppercase tracking-widest font-semibold text-neutral-300">Est. 2026</p>
-          <p className="text-2xl font-bold tracking-tight">Preserving the Soul of Sound</p>
-        </div>
-      </div>
-
-      {/* Main Philosophy */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-neutral-900">Our Heritage & Mission</h2>
-          <p className="text-neutral-600 leading-relaxed">
-            At L&apos;Archive Sonore, we believe that musical instruments are not merely tools, but vessels of creativity and history. Our archives are dedicated to collecting and making available the finest musical instruments that carry exceptional tone, craftsmanship, and soul.
+    <div className="py-6 space-y-16">
+      {/* Hero banner */}
+      <section className="relative overflow-hidden rounded-3xl border border-neutral-800">
+        <div className="absolute inset-0 bg-cover bg-center" style={heroBg} />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2E3A2C] via-[#2E3A2C]/80 to-[#2E3A2C]/40" />
+        <div className="relative z-10 flex min-h-[420px] flex-col items-center justify-center px-6 py-20 text-center text-white">
+          <span className="rounded-full border border-white/30 px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/80">
+            Est. 2026
+          </span>
+          <h1 className="mt-6 max-w-3xl font-clash text-4xl font-medium uppercase tracking-wider sm:text-5xl md:text-6xl">
+            Preserving the Soul of Sound
+          </h1>
+          <p className="mt-5 max-w-xl font-cormorant text-2xl font-light italic text-white/90 sm:text-3xl">
+            The sanctuary for handpicked, premium, and legendary musical instruments — curated for true sound artisans.
           </p>
-          <p className="text-neutral-600 leading-relaxed">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#2E3A2C] transition hover:bg-neutral-200"
+            >
+              Browse Catalog <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-full border border-white/40 px-7 py-3 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-white/10"
+            >
+              Back Home
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats band */}
+      <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm"
+          >
+            <p className="font-clash text-2xl font-bold text-sage-primary">{s.value}</p>
+            <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              {s.label}
+            </p>
+          </div>
+        ))}
+      </section>
+
+      {/* Heritage & Mission */}
+      <section className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+        <div className="order-2 space-y-5 lg:order-1">
+          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-sage-primary">
+            Our Heritage
+          </span>
+          <h2 className="font-clash text-3xl font-medium uppercase tracking-wide text-neutral-900">
+            Where instruments find their next chapter
+          </h2>
+          <p className="leading-relaxed text-neutral-600">
+            At L&apos;Archive Sonore, we believe that musical instruments are not merely tools, but vessels of creativity and history. Our archive is dedicated to collecting and offering the finest instruments that carry exceptional tone, craftsmanship, and soul.
+          </p>
+          <p className="leading-relaxed text-neutral-600">
             From the resonant vintage wood of acoustic guitars to the precision circuitry of legendary synthesizers, we serve as the bridge between historic audio masterpieces and the modern-day creator.
           </p>
         </div>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-neutral-900">Why the Archive?</h2>
-          <p className="text-neutral-600 leading-relaxed">
-            We hold each piece to an uncompromising standard. Our curators evaluate every guitar, piano, synth, and drum kit to ensure they meet the benchmark of performance and quality that master musicians expect.
+        <div className="order-1 h-72 w-full overflow-hidden rounded-3xl border border-gray-200 lg:order-2">
+          <div className="h-full w-full bg-cover bg-center" style={storyBg} />
+        </div>
+      </section>
+
+      {/* Values grid */}
+      <section className="space-y-8">
+        <div className="text-center">
+          <h2 className="font-clash text-2xl font-medium uppercase tracking-wide text-neutral-900">
+            Why the Archive?
+          </h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-neutral-500">
+            Every guitar, piano, synth, and drum kit is held to an uncompromising standard.
           </p>
-          <p className="text-neutral-600 leading-relaxed">
-            When you acquire a piece from the Archive, you are not just purchasing an instrument—you are inheritng a lineage of musical excellence.
-          </p>
         </div>
-      </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {values.map((v) => {
+            const Icon = v.icon;
+            return (
+              <div
+                key={v.title}
+                className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-sage-primary/40 hover:shadow-md"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sage-primary/10 text-sage-primary transition group-hover:bg-sage-primary group-hover:text-white">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 text-lg font-bold text-neutral-900">{v.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-600">{v.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 border-t border-gray-200 pt-12">
-        <div className="space-y-3">
-          <div className="h-10 w-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-900">
-            <Music className="h-5 w-5" />
-          </div>
-          <h3 className="font-bold text-neutral-900 text-lg">Curated Selection</h3>
-          <p className="text-sm text-neutral-600">Only the most historically significant and premium tools make it into our list.</p>
-        </div>
-
-        <div className="space-y-3">
-          <div className="h-10 w-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-900">
-            <Award className="h-5 w-5" />
-          </div>
-          <h3 className="font-bold text-neutral-900 text-lg">Elite Quality</h3>
-          <p className="text-sm text-neutral-600">Strictly inspected and setup by certified luthiers and audio specialists.</p>
-        </div>
-
-        <div className="space-y-3">
-          <div className="h-10 w-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-900">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <h3 className="font-bold text-neutral-900 text-lg">Secure Custody</h3>
-          <p className="text-sm text-neutral-600">Protected checkout systems and global safe transit for every premium item.</p>
-        </div>
-
-        <div className="space-y-3">
-          <div className="h-10 w-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-900">
-            <Heart className="h-5 w-5" />
-          </div>
-          <h3 className="font-bold text-neutral-900 text-lg">For True Creators</h3>
-          <p className="text-sm text-neutral-600">A community built upon mutual passion for music-making, recording, and design.</p>
-        </div>
-      </div>
+      {/* Quote callout */}
+      <section className="rounded-3xl bg-[#441004] px-6 py-16 text-center text-white">
+        <p className="mx-auto max-w-3xl font-cormorant text-2xl font-light italic leading-snug sm:text-3xl md:text-4xl">
+          &ldquo;When you acquire a piece from the Archive, you are not just purchasing an instrument — you are inheriting a lineage of musical excellence.&rdquo;
+        </p>
+      </section>
 
       {/* CTA */}
-      <div className="text-center bg-white border border-gray-200 p-8 rounded-lg space-y-4">
-        <h2 className="text-2xl font-bold text-neutral-900">Begin Your Sound Journey</h2>
-        <p className="text-neutral-600 max-w-md mx-auto text-sm">
+      <section className="rounded-3xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+        <h2 className="font-clash text-2xl font-medium uppercase tracking-wide text-neutral-900">
+          Begin Your Sound Journey
+        </h2>
+        <p className="mx-auto mt-3 max-w-md text-sm text-neutral-600">
           Explore our collection and discover the instrument that speaks directly to your artistic expression.
         </p>
-        <Link href="/" className="inline-flex items-center gap-2 rounded bg-neutral-900 px-6 py-3 font-semibold text-white hover:bg-neutral-800 transition text-sm">
-          Browse Catalog
+        <Link
+          href="/shop"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-sage-primary px-8 py-3 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-sage-secondary"
+        >
+          Explore the Collection <ArrowRight className="h-4 w-4" />
         </Link>
-      </div>
+      </section>
     </div>
   );
 }
