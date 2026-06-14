@@ -24,6 +24,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AuthInitializer from "@/components/layout/AuthInitializer";
 import MainWrapper from "@/components/layout/MainWrapper";
+import Toaster from "@/components/ui/Toaster";
 
 export default function RootLayout({
   children,
@@ -42,6 +43,7 @@ export default function RootLayout({
           {children}
         </MainWrapper>
         <Footer />
+        <Toaster />
       </body>
     </html>
   );

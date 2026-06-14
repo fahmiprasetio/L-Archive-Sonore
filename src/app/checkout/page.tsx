@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { toast } from '@/store/toastStore';
 import { ArrowLeft, CreditCard } from 'lucide-react';
 import Script from 'next/script';
 
@@ -14,6 +16,7 @@ declare global {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
   const totalPrice = getTotalPrice();
 
@@ -33,7 +36,7 @@ export default function CheckoutPage() {
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.address) {
-      alert('Please fill in all shipping fields');
+      toast.error('Please fill in all shipping fields');
       return;
     }
 
@@ -68,20 +71,20 @@ export default function CheckoutPage() {
       if (data.token) {
         window.snap.pay(data.token, {
           onSuccess: function (result: any) {
-            console.log('Payment success:', result);
-            alert('Payment Successful!');
             clearCart();
+            toast.success('Payment successful! Redirecting to your order...');
+            const orderId = result?.order_id || data.order_id || '';
+            router.push(`/checkout/success?order_id=${encodeURIComponent(orderId)}`);
           },
-          onPending: function (result: any) {
-            console.log('Payment pending:', result);
-            alert('Waiting for your payment!');
+          onPending: function () {
+            toast.info('Waiting for your payment to be completed.');
           },
           onError: function (result: any) {
             console.error('Payment failed:', result);
-            alert('Payment failed!');
+            toast.error('Payment failed. Please try again.');
           },
           onClose: function () {
-            console.log('Customer closed the popup without finishing the payment');
+            toast.info('Payment window closed before completion.');
           },
         });
       } else {
@@ -89,7 +92,7 @@ export default function CheckoutPage() {
       }
     } catch (error: any) {
       console.error('Payment error:', error);
-      alert(error.message || 'Payment error occurred');
+      toast.error(error.message || 'Payment error occurred');
     } finally {
       setLoading(false);
     }
