@@ -37,16 +37,11 @@ export default function Navbar() {
   return (
     <header
       className={`fixed z-50 transition-all duration-500 ease-in-out ${isScrolled
-        ? 'top-4 left-6 bg-black/40 backdrop-blur-sm border border-white/10 py-2.5 px-5 shadow-xl text-white'
+        ? 'top-4 left-6 w-[20rem] max-w-[calc(100vw-3rem)] rounded-2xl bg-black/40 backdrop-blur-sm border border-white/10 py-2.5 px-5 shadow-xl text-white'
         : isOpen
-          ? 'top-0 left-0 bg-black/5 backdrop-blur-md border-b border-white/10 py-5 px-6 text-white'
-          : 'top-0 left-0 bg-transparent border-transparent py-5 text-current'
+          ? 'top-0 left-0 w-full bg-black/5 backdrop-blur-md border-b border-white/10 py-5 px-6 text-white'
+          : 'top-0 left-0 w-full bg-transparent border-transparent py-5 text-current'
         }`}
-      style=
-        width: isScrolled ? '20rem' : '100%',
-        maxWidth: isScrolled ? 'calc(100vw - 3rem)' : undefined,
-        borderRadius: isScrolled ? '14px' : undefined,
-      
     >
       <div
         className={`flex items-center justify-between w-full transition-all duration-500 ${isScrolled ? '' : 'mx-auto max-w-[95%] px-6'
