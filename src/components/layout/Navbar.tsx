@@ -52,9 +52,7 @@ export default function Navbar() {
           href="/"
           className={`font-bold tracking-widest font-clash uppercase transition-all duration-300 whitespace-nowrap ${isScrolled
             ? 'text-white text-sm sm:text-base hover:opacity-85'
-            : isHome
-              ? 'text-white text-lg sm:text-xl hover:text-white/80'
-              : 'text-neutral-900 text-lg sm:text-xl hover:text-neutral-700'
+            : 'text-white text-lg sm:text-xl hover:text-white/80'
             }`}
         >
           L&apos;Archive Sonore
@@ -67,12 +65,10 @@ export default function Navbar() {
           aria-label="Toggle Menu"
         >
           <span
-            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isOpen || isHome ? 'bg-white' : 'bg-neutral-900'
-              } ${isOpen ? 'w-5 rotate-45 translate-y-[4px]' : 'w-5'}`}
+            className={`h-0.5 bg-white transition-all duration-300 ease-out ${isOpen ? 'w-5 rotate-45 translate-y-[4px]' : 'w-5'}`}
           ></span>
           <span
-            className={`h-0.5 transition-all duration-300 ease-out ${isScrolled || isOpen || isHome ? 'bg-white' : 'bg-neutral-900'
-              } ${isOpen ? 'w-5 -rotate-45 -translate-y-[4px]' : 'w-3'}`}
+            className={`h-0.5 bg-white transition-all duration-300 ease-out ${isOpen ? 'w-5 -rotate-45 -translate-y-[4px]' : 'w-3'}`}
           ></span>
         </button>
       </div>

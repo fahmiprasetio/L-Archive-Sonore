@@ -98,7 +98,7 @@ export default function ShopPage() {
       <div className="h-screen w-full" aria-hidden />
 
       {/* Sheet konten shop: naik menutupi hero saat scroll (efek parallax) */}
-      <div className="relative z-10 min-h-screen rounded-t-3xl bg-[#F4F2EC] px-6 pt-10 pb-16 shadow-[0_-24px_48px_rgba(0,0,0,0.18)]">
+      <div className="relative z-10 min-h-screen bg-[#F4F2EC] px-6 pt-10 pb-16 shadow-[0_-24px_48px_rgba(0,0,0,0.18)]">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Desktop Sidebar — borderless, menyatu dengan latar, pepet kiri */}
           <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-24 pr-6">
