@@ -4,9 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { ArrowLeft, CreditCard } from 'lucide-react';
+import Script from 'next/script';
+
+declare global {
+  interface Window {
+    snap: any;
+  }
+}
 
 export default function CheckoutPage() {
-  const { items, getTotalPrice } = useCartStore();
+  const { items, getTotalPrice, clearCart } = useCartStore();
   const totalPrice = getTotalPrice();
 
   const [formData, setFormData] = useState({
@@ -31,16 +38,48 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
-      // Placeholder for future Midtrans API call
-      console.log('Initiating payment for order:', {
-        customer: formData,
-        items,
-        amount: totalPrice,
+      const response = await fetch('/api/payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items,
+          customerDetails: formData,
+        }),
       });
 
-      alert('Payment initiation triggered! Connecting to Midtrans soon...');
-    } catch (error) {
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to initiate payment');
+      }
+
+      if (data.token) {
+        window.snap.pay(data.token, {
+          onSuccess: function (result: any) {
+            console.log('Payment success:', result);
+            alert('Payment Successful!');
+            clearCart();
+          },
+          onPending: function (result: any) {
+            console.log('Payment pending:', result);
+            alert('Waiting for your payment!');
+          },
+          onError: function (result: any) {
+            console.error('Payment failed:', result);
+            alert('Payment failed!');
+          },
+          onClose: function () {
+            console.log('Customer closed the popup without finishing the payment');
+          },
+        });
+      } else {
+        throw new Error('No snap token received');
+      }
+    } catch (error: any) {
       console.error('Payment error:', error);
+      alert(error.message || 'Payment error occurred');
     } finally {
       setLoading(false);
     }
@@ -172,6 +211,11 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+      <Script
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+        strategy="lazyOnload"
+      />
     </div>
   );
 }
