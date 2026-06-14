@@ -82,12 +82,12 @@ export default function ShopPage() {
     sortBy !== 'default';
 
   return (
-    <div className="relative w-full min-h-screen py-8 text-white">
-      {/* Full-bleed red background to match the homepage */}
-      <div aria-hidden className="fixed inset-0 -z-10 bg-[#441004]" />
+    <div className="relative w-full min-h-screen py-8 text-[#2E3A2C]">
+      {/* Full-bleed sage background */}
+      <div aria-hidden className="fixed inset-0 -z-10 bg-[#8A9A86]" />
 
-      {/* Hero section (taller — siap untuk gambar/aset overlay) */}
-      <div className="relative mb-10 flex min-h-[60vh] flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#441004] px-6 py-24 text-center">
+      {/* Hero section (taller — panel sage gelap, siap untuk gambar/aset overlay) */}
+      <div className="relative mb-10 flex min-h-[60vh] flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#3A4438] px-6 py-24 text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wider text-white uppercase font-clash">
           The Archive Shop
         </h1>
@@ -322,23 +322,23 @@ export default function ShopPage() {
 
           {/* Results count & current filters summary */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <p className="text-xs text-white/60 font-semibold uppercase tracking-wider">
-              Showing <span className="text-white font-bold">{sortedProducts.length}</span> of {PRODUCTS.length} Instruments
+            <p className="text-xs text-[#2E3A2C]/70 font-semibold uppercase tracking-wider">
+              Showing <span className="text-[#2E3A2C] font-bold">{sortedProducts.length}</span> of {PRODUCTS.length} Instruments
             </p>
 
             {/* Selected category tags if any */}
             {selectedCategories.length > 0 && (
               <div className="flex flex-wrap gap-1.5 items-center">
-                <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold mr-1">Active:</span>
+                <span className="text-[10px] text-[#2E3A2C]/60 uppercase tracking-widest font-bold mr-1">Active:</span>
                 {selectedCategories.map((cat) => (
                   <span
                     key={cat}
-                    className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white border border-white/20 pl-2 pr-1.5 py-0.5 rounded-full"
+                    className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-[#2E3A2C]/10 text-[#2E3A2C] border border-[#2E3A2C]/20 pl-2 pr-1.5 py-0.5 rounded-full"
                   >
                     {cat}
                     <button
                       onClick={() => toggleCategory(cat)}
-                      className="hover:text-white/70 transition cursor-pointer"
+                      className="hover:text-[#2E3A2C]/60 transition cursor-pointer"
                     >
                       <X className="h-3 w-3" />
                     </button>
