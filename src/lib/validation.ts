@@ -26,6 +26,19 @@ export function isPositiveInt(v: unknown): v is number {
   return typeof v === 'number' && Number.isInteger(v) && v > 0;
 }
 
+// Bersihkan array URL gambar: hanya string non-kosong, dipangkas, unik, maks 12.
+export function sanitizeImageUrls(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  const urls: string[] = [];
+  for (const v of input) {
+    if (typeof v !== 'string') continue;
+    const s = v.trim().slice(0, 2000);
+    if (s) urls.push(s);
+    if (urls.length >= 12) break;
+  }
+  return Array.from(new Set(urls));
+}
+
 // ---- Cart items (untuk /api/payment) ----
 
 export interface ValidatedCartItem {
@@ -92,6 +105,7 @@ export interface ValidatedProductInput {
   description: string;
   price: number;
   image_url: string;
+  images: string[];
   category: string;
   stock: number;
 }
@@ -121,6 +135,7 @@ export function validateNewProduct(input: unknown): ValidationResult<ValidatedPr
       description: typeof input.description === 'string' ? input.description.slice(0, 5000) : '',
       price,
       image_url: typeof input.image_url === 'string' ? input.image_url.slice(0, 2000) : '',
+      images: sanitizeImageUrls(input.images),
       category: typeof input.category === 'string' ? input.category.slice(0, 100) : '',
       stock,
     },
@@ -149,6 +164,10 @@ export function validateProductUpdates(
   if ('image_url' in input) {
     if (typeof input.image_url !== 'string') return { ok: false, error: 'image_url must be a string' };
     out.image_url = input.image_url.slice(0, 2000);
+  }
+  if ('images' in input) {
+    if (!Array.isArray(input.images)) return { ok: false, error: 'images must be an array of URLs' };
+    out.images = sanitizeImageUrls(input.images);
   }
   if ('category' in input) {
     if (typeof input.category !== 'string') return { ok: false, error: 'Category must be a string' };

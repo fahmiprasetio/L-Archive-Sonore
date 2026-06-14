@@ -11,6 +11,11 @@ export const PRODUCTS: ProductWithSpecs[] = [
     description: 'The legendary solid-body electric guitar with dual humbuckers and mahogany construction.',
     price: 2499,
     image_url: 'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1564186763535-ebb21ec52744?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=600'
+    ],
     category: 'Guitar',
     specs: ['Mahogany Body', 'Rosewood Fretboard', 'Burstbucker Pickups', 'Nitrocellulose Finish']
   },
@@ -20,6 +25,10 @@ export const PRODUCTS: ProductWithSpecs[] = [
     description: 'A perennial favorite among discerning pianists, offering outstanding musical performance.',
     price: 8999,
     image_url: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1552422535-c45813c61732?auto=format&fit=crop&q=80&w=600'
+    ],
     category: 'Piano',
     specs: ['Spruce Soundboard', 'V-Pro Plate', 'Premium Felt Hammers', 'Soft-Close Fallboard']
   },
@@ -29,6 +38,10 @@ export const PRODUCTS: ProductWithSpecs[] = [
     description: 'Electronic drum kit with premium snare, hi-hat, and cymbals for professional practice.',
     price: 1699,
     image_url: 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&q=80&w=600',
+    images: [
+      'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1543443374-b6fe10a6ab7b?auto=format&fit=crop&q=80&w=600'
+    ],
     category: 'Drums',
     specs: ['Mesh Snare Pad', 'VH-10 Hi-Hat', 'TD-17 Sound Module', 'Bluetooth Connectivity']
   },

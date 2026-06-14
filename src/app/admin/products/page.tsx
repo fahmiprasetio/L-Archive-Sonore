@@ -11,6 +11,7 @@ const EMPTY_FORM: ProductInput = {
   description: '',
   price: 0,
   image_url: '',
+  images: [],
   category: '',
   stock: 0,
 };
@@ -32,6 +33,7 @@ export default function AdminProductsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ProductInput>(EMPTY_FORM);
+  const [galleryText, setGalleryText] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -50,6 +52,7 @@ export default function AdminProductsPage() {
   const openAdd = () => {
     setEditingId(null);
     setForm(EMPTY_FORM);
+    setGalleryText('');
     setShowForm(true);
   };
 
@@ -60,9 +63,13 @@ export default function AdminProductsPage() {
       description: p.description,
       price: p.price,
       image_url: p.image_url,
+      images: p.images ?? [],
       category: p.category,
       stock: p.stock ?? 0,
     });
+    // Galeri tambahan = images selain sampul (image_url).
+    const extra = (p.images ?? []).filter((url) => url !== p.image_url);
+    setGalleryText(extra.join('\n'));
     setShowForm(true);
   };
 
@@ -70,6 +77,7 @@ export default function AdminProductsPage() {
     setShowForm(false);
     setEditingId(null);
     setForm(EMPTY_FORM);
+    setGalleryText('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,10 +85,17 @@ export default function AdminProductsPage() {
     if (!form.name.trim() || !form.category.trim()) return;
     setSaving(true);
     try {
+      const cover = form.image_url.trim();
+      const galleryUrls = galleryText
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const images = Array.from(new Set([cover, ...galleryUrls].filter(Boolean)));
+      const payload: ProductInput = { ...form, image_url: cover, images };
       if (editingId) {
-        await updateProduct(editingId, form);
+        await updateProduct(editingId, payload);
       } else {
-        await addProduct(form);
+        await addProduct(payload);
       }
       closeForm();
     } catch (err) {
@@ -195,14 +210,25 @@ export default function AdminProductsPage() {
                 className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sage-primary"
               />
             </div>
-            <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-500">Image URL</label>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-500">Image URL (sampul)</label>
               <input
                 value={form.image_url}
                 onChange={(e) => setForm({ ...form, image_url: e.target.value })}
                 placeholder="https://..."
                 className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sage-primary"
               />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-500">Gallery Images (satu URL per baris)</label>
+              <textarea
+                value={galleryText}
+                onChange={(e) => setGalleryText(e.target.value)}
+                rows={3}
+                placeholder="https://gambar-2.jpg&#10;https://gambar-3.jpg"
+                className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sage-primary"
+              />
+              <p className="mt-1 text-xs text-neutral-400">Image URL di atas dipakai sebagai sampul. Tambahkan URL lain di sini untuk galeri di halaman detail.</p>
             </div>
             <div className="sm:col-span-2">
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-neutral-500">Description</label>

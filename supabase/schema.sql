@@ -17,6 +17,9 @@ create table if not exists public.products (
 -- Kolom stok (idempoten; baris lama mendapat default 10)
 alter table public.products add column if not exists stock integer not null default 10;
 
+-- Kolom galeri gambar tambahan (idempoten; default array kosong)
+alter table public.products add column if not exists images text[] not null default '{}';
+
 alter table public.products enable row level security;
 
 -- Publik hanya boleh MEMBACA produk. Tulis hanya lewat server (service_role,

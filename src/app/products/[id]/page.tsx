@@ -30,10 +30,16 @@ export default function ProductDetailPage({ params }: PageProps) {
   const items = useCartStore((state) => state.items);
 
   const [qty, setQty] = useState(1);
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  // Reset gambar aktif saat berpindah produk.
+  useEffect(() => {
+    setActiveImage(0);
+  }, [id]);
 
   const product = useMemo<ProductWithSpecs | undefined>(() => {
     const fromStore = products.find((p) => p.id === id);
@@ -43,6 +49,12 @@ export default function ProductDetailPage({ params }: PageProps) {
     }
     return fromMock;
   }, [products, id]);
+
+  // Galeri gambar: pakai product.images bila ada, jika tidak fallback ke image_url.
+  const gallery = useMemo<string[]>(() => {
+    if (product?.images && product.images.length > 0) return product.images;
+    return product?.image_url ? [product.image_url] : [];
+  }, [product]);
 
   // Rekomendasi produk: kategori sama dulu, lalu isi sisanya dari produk lain.
   const relatedProducts = useMemo(() => {
@@ -98,6 +110,8 @@ export default function ProductDetailPage({ params }: PageProps) {
     setQty(1);
   };
 
+  const activeSrc = gallery[activeImage] ?? gallery[0];
+
   return (
     <div className="py-6 space-y-6">
       <Link href="/" className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition">
@@ -105,16 +119,37 @@ export default function ProductDetailPage({ params }: PageProps) {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white border border-gray-200 rounded-lg p-6">
-        <div className="aspect-square w-full rounded bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden">
-          {product.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className={`h-full w-full object-cover ${soldOut ? 'opacity-50 grayscale' : ''}`}
-            />
-          ) : (
-            <span>No Image</span>
+        <div className="space-y-3">
+          <div className="aspect-square w-full rounded bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden">
+            {activeSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={activeSrc}
+                alt={product.name}
+                className={`h-full w-full object-cover ${soldOut ? 'opacity-50 grayscale' : ''}`}
+              />
+            ) : (
+              <span>No Image</span>
+            )}
+          </div>
+
+          {gallery.length > 1 && (
+            <div className="grid grid-cols-4 gap-2">
+              {gallery.map((src, idx) => (
+                <button
+                  key={`${src}-${idx}`}
+                  type="button"
+                  onClick={() => setActiveImage(idx)}
+                  className={`aspect-square overflow-hidden rounded-md border-2 transition ${
+                    idx === activeImage ? 'border-neutral-900' : 'border-transparent hover:border-gray-300'
+                  }`}
+                  aria-label={`View image ${idx + 1}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt={`${product.name} ${idx + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
