@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { isAdminEmail } from '@/lib/admin';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { fetchAllOrdersAdmin } from '@/lib/db/orders';
+import { fetchAllOrdersAdmin, updateOrderStatusAdmin, ORDER_STATUSES } from '@/lib/db/orders';
 import type { Order } from '@/lib/db/orders';
+import { toast } from '@/store/toastStore';
 import { Users, ShoppingBag, ShieldCheck } from 'lucide-react';
 
 interface MockUser {
@@ -19,6 +20,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<MockUser[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -46,9 +48,38 @@ export default function AdminUsersPage() {
   const currency = (n: number) => '$' + n.toLocaleString('en-US');
 
   const statusColor = (status: string) => {
-    if (status === 'paid') return 'bg-green-100 text-green-700';
-    if (status === 'failed') return 'bg-red-100 text-red-700';
-    return 'bg-amber-100 text-amber-700';
+    switch (status) {
+      case 'paid':
+        return 'bg-green-100 text-green-700';
+      case 'processing':
+        return 'bg-blue-100 text-blue-700';
+      case 'shipped':
+        return 'bg-indigo-100 text-indigo-700';
+      case 'delivered':
+        return 'bg-emerald-100 text-emerald-700';
+      case 'cancelled':
+        return 'bg-neutral-200 text-neutral-600';
+      case 'failed':
+        return 'bg-red-100 text-red-700';
+      default:
+        return 'bg-amber-100 text-amber-700';
+    }
+  };
+
+  const handleStatusChange = async (id: string, status: string) => {
+    const previous = orders;
+    setUpdatingId(id);
+    // Optimistic update
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+    try {
+      await updateOrderStatusAdmin(id, status);
+      toast.success(`Order updated to "${status}"`);
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update order status');
+      setOrders(previous); // revert
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   return (
@@ -160,9 +191,19 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-3 font-semibold text-neutral-900">{currency(o.total)}</td>
                     <td className="px-6 py-3">
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor(o.status)}`}>
-                        {o.status}
-                      </span>
+                      <select
+                        value={o.status}
+                        disabled={updatingId === o.id}
+                        onChange={(e) => handleStatusChange(o.id, e.target.value)}
+                        className={`rounded-full border-0 px-2.5 py-1 text-xs font-semibold capitalize cursor-pointer focus:outline-none focus:ring-2 focus:ring-sage-primary/40 disabled:opacity-50 ${statusColor(o.status)}`}
+                        aria-label={`Status for order ${o.id}`}
+                      >
+                        {ORDER_STATUSES.map((s) => (
+                          <option key={s} value={s} className="bg-white capitalize text-neutral-900">
+                            {s}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td className="px-6 py-3 text-xs text-neutral-500">
                       {new Date(o.created_at).toLocaleString('id-ID')}
