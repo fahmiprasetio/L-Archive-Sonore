@@ -82,20 +82,23 @@ export default function ShopPage() {
     sortBy !== 'default';
 
   return (
-    <div className="w-full min-h-screen py-8">
-      {/* Header section */}
-      <div className="mb-8 border-b border-neutral-200 pb-5">
-        <h1 className="text-4xl font-bold tracking-wider text-neutral-900 uppercase font-clash">
+    <div className="relative w-full min-h-screen py-8 text-white">
+      {/* Full-bleed red background to match the homepage */}
+      <div aria-hidden className="fixed inset-0 -z-10 bg-[#441004]" />
+
+      {/* Hero section (taller — siap untuk gambar/aset overlay) */}
+      <div className="relative mb-10 flex min-h-[60vh] flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#441004] px-6 py-24 text-center">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wider text-white uppercase font-clash">
           The Archive Shop
         </h1>
-        <p className="text-sm text-neutral-600 mt-2 font-light tracking-wide uppercase">
+        <p className="text-sm text-white/70 mt-4 font-light tracking-wide uppercase">
           Browse our complete inventory of professional and historical instruments
         </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Desktop Sidebar (hidden on mobile/tablet, shown on lg screens) */}
-        <aside className="hidden lg:block w-64 flex-shrink-0 bg-white border border-neutral-200/80 rounded-xl p-6 shadow-sm sticky top-24">
+        <aside className="hidden lg:block w-80 flex-shrink-0 bg-white border border-neutral-200/80 rounded-xl p-6 shadow-sm sticky top-24">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-clash text-lg font-semibold tracking-wider text-neutral-900 uppercase flex items-center gap-2">
               <SlidersHorizontal className="h-4.5 w-4.5 text-sage-primary" />
@@ -319,23 +322,23 @@ export default function ShopPage() {
 
           {/* Results count & current filters summary */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <p className="text-xs text-neutral-500 font-semibold uppercase tracking-wider">
-              Showing <span className="text-neutral-900 font-bold">{sortedProducts.length}</span> of {PRODUCTS.length} Instruments
+            <p className="text-xs text-white/60 font-semibold uppercase tracking-wider">
+              Showing <span className="text-white font-bold">{sortedProducts.length}</span> of {PRODUCTS.length} Instruments
             </p>
 
             {/* Selected category tags if any */}
             {selectedCategories.length > 0 && (
               <div className="flex flex-wrap gap-1.5 items-center">
-                <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-bold mr-1">Active:</span>
+                <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold mr-1">Active:</span>
                 {selectedCategories.map((cat) => (
                   <span
                     key={cat}
-                    className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-sage-primary/10 text-sage-primary border border-sage-primary/20 pl-2 pr-1.5 py-0.5 rounded-full"
+                    className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white border border-white/20 pl-2 pr-1.5 py-0.5 rounded-full"
                   >
                     {cat}
                     <button
                       onClick={() => toggleCategory(cat)}
-                      className="hover:text-sage-secondary transition cursor-pointer"
+                      className="hover:text-white/70 transition cursor-pointer"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -349,22 +352,22 @@ export default function ShopPage() {
           {sortedProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} dark />
               ))}
             </div>
           ) : (
             /* Empty State */
-            <div className="flex flex-col items-center justify-center text-center py-20 bg-white border border-neutral-200/80 rounded-xl shadow-sm px-6">
-              <SlidersHorizontal className="h-12 w-12 text-neutral-300 mb-4" />
-              <h3 className="font-clash text-lg font-semibold text-neutral-900 uppercase tracking-wider">
+            <div className="flex flex-col items-center justify-center text-center py-20 bg-black/20 backdrop-blur-md border border-white/10 rounded-xl shadow-sm px-6">
+              <SlidersHorizontal className="h-12 w-12 text-white/30 mb-4" />
+              <h3 className="font-clash text-lg font-semibold text-white uppercase tracking-wider">
                 No Instruments Found
               </h3>
-              <p className="text-sm text-neutral-500 mt-2 max-w-sm">
+              <p className="text-sm text-white/60 mt-2 max-w-sm">
                 We couldn&apos;t find any instruments matching your active filters. Try adjusting your search query, categories, or price range.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-neutral-800 transition cursor-pointer"
+                className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-[#EFE6D3] text-[#441004] rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-[#E5D8BD] transition cursor-pointer"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Clear All Filters

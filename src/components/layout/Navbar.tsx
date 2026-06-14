@@ -42,10 +42,11 @@ export default function Navbar() {
           ? 'top-0 left-0 bg-black/5 backdrop-blur-md border-b border-white/10 py-5 px-6 text-white'
           : 'top-0 left-0 bg-transparent border-transparent py-5 text-current'
         }`}
-      style={{
-        width: isScrolled ? 'min(420px, calc(100vw - 3rem))' : '100%',
-        borderRadius: isScrolled ? '15px' : '0px',
-      }}
+      style=
+        width: isScrolled ? '20rem' : '100%',
+        maxWidth: isScrolled ? 'calc(100vw - 3rem)' : undefined,
+        borderRadius: isScrolled ? '14px' : undefined,
+      
     >
       <div
         className={`flex items-center justify-between w-full transition-all duration-500 ${isScrolled ? '' : 'mx-auto max-w-[95%] px-6'
@@ -111,4 +112,3 @@ export default function Navbar() {
     </header>
   );
 }
-
