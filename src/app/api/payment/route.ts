@@ -31,6 +31,47 @@ export async function POST(request: Request) {
     const items = itemsResult.value;
     const customerDetails = customerResult.value;
 
+    // Validasi stok terhadap data terbaru di database (otoritatif).
+    // Mencegah pembelian melebihi stok walau data di keranjang sudah basi.
+    if (supabaseAdmin) {
+      const ids = items.map((item) => item.product.id);
+      const { data: dbProducts, error: stockErr } = await supabaseAdmin
+        .from('products')
+        .select('id, name, stock')
+        .in('id', ids);
+
+      if (stockErr) {
+        console.error('Gagal memeriksa stok:', stockErr);
+        return NextResponse.json(
+          { error: 'Gagal memeriksa stok produk. Coba lagi.' },
+          { status: 500 }
+        );
+      }
+
+      const dbMap = new Map((dbProducts ?? []).map((p) => [p.id, p]));
+      const issues: string[] = [];
+      for (const item of items) {
+        const dbp = dbMap.get(item.product.id);
+        if (!dbp) {
+          issues.push(`Produk \"${item.product.name}\" sudah tidak tersedia`);
+          continue;
+        }
+        const stock = typeof dbp.stock === 'number' ? dbp.stock : 0;
+        if (stock <= 0) {
+          issues.push(`\"${dbp.name}\" sedang habis`);
+        } else if (item.quantity > stock) {
+          issues.push(`\"${dbp.name}\" hanya tersisa ${stock} (diminta ${item.quantity})`);
+        }
+      }
+
+      if (issues.length > 0) {
+        return NextResponse.json(
+          { error: `Stok tidak mencukupi: ${issues.join('; ')}` },
+          { status: 409 }
+        );
+      }
+    }
+
     // Generate a unique order ID
     const orderId = `LARCHIVE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
