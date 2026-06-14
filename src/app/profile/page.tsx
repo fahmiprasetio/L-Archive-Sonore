@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
-import { LogOut, User, ShieldAlert, ShoppingCart } from 'lucide-react';
+import { isAdminEmail } from '@/lib/admin';
+import { LogOut, User, ShieldAlert, ShoppingCart, LayoutDashboard } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, loading, signOut, isMockMode } = useAuthStore();
   const router = useRouter();
-  
+
   const items = useCartStore((state) => state.items);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -41,6 +42,8 @@ export default function ProfilePage() {
     return null; // will redirect in useEffect
   }
 
+  const admin = isAdminEmail(user.email);
+
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-6 shadow-sm">
@@ -57,13 +60,31 @@ export default function ProfilePage() {
           </div>
         )}
 
+        {admin && (
+          <Link
+            href="/admin"
+            className="flex items-center justify-between gap-3 rounded-lg border border-sage-primary/30 bg-sage-primary/5 p-4 transition hover:bg-sage-primary/10"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sage-primary/15 text-sage-primary">
+                <LayoutDashboard className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-semibold text-neutral-900">Admin Dashboard</p>
+                <p className="text-xs text-neutral-500">Kelola produk, lihat user &amp; pesanan</p>
+              </div>
+            </div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-sage-primary">Open &rarr;</span>
+          </Link>
+        )}
+
         <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
           <div className="h-16 w-16 rounded-full bg-neutral-900 flex items-center justify-center text-white">
             <User className="h-8 w-8" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-neutral-900">{user.name}</h1>
-            <p className="text-neutral-500 text-sm">Member Account</p>
+            <p className="text-neutral-500 text-sm">{admin ? 'Administrator' : 'Member Account'}</p>
           </div>
         </div>
 

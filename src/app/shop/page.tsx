@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, SlidersHorizontal, RotateCcw, X, ChevronDown } from 'lucide-react';
 import { PRODUCTS } from '@/lib/products';
+import type { Product } from '@/types';
+import { useProductStore } from '@/store/productStore';
 import ProductCard from '@/components/product/ProductCard';
 
 export default function ShopPage() {
@@ -13,21 +15,30 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState('default');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
+  // Sumber produk dari store (bisa diubah lewat Admin Dashboard), persisten di localStorage.
+  // Pakai data statis dulu sebelum mount agar tidak terjadi hydration mismatch.
+  const storeProducts = useProductStore((s) => s.products);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const allProducts: Product[] = mounted ? storeProducts : (PRODUCTS as Product[]);
+
   // Get dynamic categories and counts
   const { categories, categoryCounts } = useMemo(() => {
     const counts: Record<string, number> = {};
-    PRODUCTS.forEach((p) => {
+    allProducts.forEach((p) => {
       counts[p.category] = (counts[p.category] || 0) + 1;
     });
     return {
       categories: Object.keys(counts).sort(),
       categoryCounts: counts,
     };
-  }, []);
+  }, [allProducts]);
 
   // Filter products logic
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return allProducts.filter((product) => {
       const matchesSearch =
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -40,7 +51,7 @@ export default function ShopPage() {
 
       return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
     });
-  }, [searchQuery, selectedCategories, minPrice, maxPrice]);
+  }, [allProducts, searchQuery, selectedCategories, minPrice, maxPrice]);
 
   // Sort products logic
   const sortedProducts = useMemo(() => {
@@ -326,7 +337,7 @@ export default function ShopPage() {
             {/* Results count & current filters summary */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
               <p className="text-xs text-[#2E3A2C]/70 font-semibold uppercase tracking-wider">
-                Showing <span className="text-[#2E3A2C] font-bold">{sortedProducts.length}</span> of {PRODUCTS.length} Instruments
+                Showing <span className="text-[#2E3A2C] font-bold">{sortedProducts.length}</span> of {allProducts.length} Instruments
               </p>
 
               {/* Selected category tags if any */}
