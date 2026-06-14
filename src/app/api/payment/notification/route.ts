@@ -57,33 +57,35 @@ export async function POST(request: Request) {
       status = 'pending';
     }
 
-    // Ambil order untuk tahu status sebelumnya & item (untuk kurangi stok sekali saja).
-    const { data: existing } = await supabaseAdmin
-      .from('orders')
-      .select('*')
-      .eq('id', order_id)
-      .single();
+    if (status === 'paid') {
+      // Transisi ke 'paid' dilakukan dengan update BERSYARAT (.neq status 'paid').
+      // Hanya transisi PERTAMA yang mengembalikan baris, sehingga pengurangan
+      // stok dijamin berjalan tepat satu kali meski webhook terkirim berkali-kali.
+      const { data: updated } = await supabaseAdmin
+        .from('orders')
+        .update({ status: 'paid' })
+        .eq('id', order_id)
+        .neq('status', 'paid')
+        .select('id, items');
 
-    await supabaseAdmin.from('orders').update({ status }).eq('id', order_id);
-
-    if (
-      status === 'paid' &&
-      existing &&
-      existing.status !== 'paid' &&
-      Array.isArray(existing.items)
-    ) {
-      for (const item of existing.items) {
-        const { data: prod } = await supabaseAdmin
-          .from('products')
-          .select('stock')
-          .eq('id', item.id)
-          .single();
-        if (prod) {
-          const current = typeof prod.stock === 'number' ? prod.stock : 0;
-          const newStock = Math.max(0, current - (item.quantity || 0));
-          await supabaseAdmin.from('products').update({ stock: newStock }).eq('id', item.id);
+      const justPaid = updated && updated.length > 0 ? updated[0] : null;
+      if (justPaid && Array.isArray(justPaid.items)) {
+        for (const item of justPaid.items) {
+          const { data: prod } = await supabaseAdmin
+            .from('products')
+            .select('stock')
+            .eq('id', item.id)
+            .single();
+          if (prod) {
+            const current = typeof prod.stock === 'number' ? prod.stock : 0;
+            const newStock = Math.max(0, current - (item.quantity || 0));
+            await supabaseAdmin.from('products').update({ stock: newStock }).eq('id', item.id);
+          }
         }
       }
+    } else {
+      // Status lain (pending/failed): cukup perbarui status order.
+      await supabaseAdmin.from('orders').update({ status }).eq('id', order_id);
     }
 
     return NextResponse.json({ received: true });
