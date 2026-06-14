@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { snap } from '@/lib/midtrans';
+import { supabase } from '@/lib/supabase';
 import { CartItem } from '@/types';
 
 export async function POST(request: Request) {
@@ -54,9 +55,32 @@ export async function POST(request: Request) {
     // Call Midtrans Snap API to get transaction token and redirect url
     const transaction = await snap.createTransaction(parameter);
 
+    // Catat order ke Supabase (status pending) bila Supabase terkonfigurasi.
+    if (supabase) {
+      try {
+        await supabase.from('orders').insert({
+          id: orderId,
+          customer_name: customerDetails.name,
+          customer_email: customerDetails.email,
+          customer_address: customerDetails.address || '',
+          items: items.map((item: CartItem) => ({
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+          })),
+          total: grossAmount,
+          status: 'pending',
+        });
+      } catch (e) {
+        console.error('Gagal mencatat order ke Supabase:', e);
+      }
+    }
+
     return NextResponse.json({
       token: transaction.token,
       redirect_url: transaction.redirect_url,
+      order_id: orderId,
     });
   } catch (error: any) {
     console.error('Midtrans Snap transaction creation failed:', error);

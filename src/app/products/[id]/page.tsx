@@ -1,23 +1,49 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
+import { useProductStore } from '@/store/productStore';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
+import type { Product } from '@/types';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+type ProductWithSpecs = Product & { specs?: string[] };
+
 export default function ProductDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const id = resolvedParams.id;
-  
-  const product = MOCK_PRODUCTS.find((p) => p.id === id);
+
+  const products = useProductStore((s) => s.products);
+  const loaded = useProductStore((s) => s.loaded);
+  const loadProducts = useProductStore((s) => s.loadProducts);
   const addItem = useCartStore((state) => state.addItem);
 
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  const product = useMemo<ProductWithSpecs | undefined>(() => {
+    const fromStore = products.find((p) => p.id === id);
+    const fromMock = MOCK_PRODUCTS.find((p) => p.id === id);
+    if (fromStore) {
+      return fromMock?.specs ? { ...fromStore, specs: fromMock.specs } : fromStore;
+    }
+    return fromMock;
+  }, [products, id]);
+
   if (!product) {
+    if (!loaded) {
+      return (
+        <div className="py-12 text-center text-neutral-500">
+          <p className="text-lg font-medium">Loading product...</p>
+        </div>
+      );
+    }
     return (
       <div className="py-12 text-center">
         <h2 className="text-2xl font-bold text-neutral-900">Product Not Found</h2>
@@ -36,9 +62,9 @@ export default function ProductDetailPage({ params }: PageProps) {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white border border-gray-200 rounded-lg p-6">
-        {/* Left: Product Image */}
         <div className="aspect-square w-full rounded bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden">
           {product.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={product.image_url}
               alt={product.name}
@@ -49,7 +75,6 @@ export default function ProductDetailPage({ params }: PageProps) {
           )}
         </div>
 
-        {/* Right: Product Details */}
         <div className="flex flex-col justify-between">
           <div className="space-y-4">
             <div>

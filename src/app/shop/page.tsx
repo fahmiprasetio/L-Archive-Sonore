@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Search, SlidersHorizontal, RotateCcw, X, ChevronDown } from 'lucide-react';
-import { PRODUCTS } from '@/lib/products';
 import type { Product } from '@/types';
 import { useProductStore } from '@/store/productStore';
 import ProductCard from '@/components/product/ProductCard';
@@ -15,14 +14,14 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState('default');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
-  // Sumber produk dari store (bisa diubah lewat Admin Dashboard), persisten di localStorage.
-  // Pakai data statis dulu sebelum mount agar tidak terjadi hydration mismatch.
-  const storeProducts = useProductStore((s) => s.products);
-  const [mounted, setMounted] = useState(false);
+  // Sumber produk dari store (Supabase bila terkonfigurasi, jika tidak fallback lokal).
+  const products = useProductStore((s) => s.products);
+  const loaded = useProductStore((s) => s.loaded);
+  const loadProducts = useProductStore((s) => s.loadProducts);
   useEffect(() => {
-    setMounted(true);
-  }, []);
-  const allProducts: Product[] = mounted ? storeProducts : (PRODUCTS as Product[]);
+    loadProducts();
+  }, [loadProducts]);
+  const allProducts: Product[] = products;
 
   // Get dynamic categories and counts
   const { categories, categoryCounts } = useMemo(() => {
@@ -94,8 +93,7 @@ export default function ShopPage() {
 
   return (
     <div className="relative w-full text-[#2E3A2C]">
-      {/* Hero fixed setinggi satu layar — diam saat scroll, jadi alas efek parallax.
-          Siap ditimpa gambar/aset visual nanti. */}
+      {/* Hero fixed setinggi satu layar — diam saat scroll, jadi alas efek parallax. */}
       <div className="fixed inset-0 -z-10 flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#3A4438] px-6 text-center">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-white uppercase font-clash">
           The Archive Shop
@@ -105,13 +103,13 @@ export default function ShopPage() {
         </p>
       </div>
 
-      {/* Spacer setinggi satu layar: hero terlihat penuh sebelum konten naik */}
+      {/* Spacer setinggi satu layar */}
       <div className="h-screen w-full" aria-hidden />
 
-      {/* Sheet konten shop: naik menutupi hero saat scroll (efek parallax) */}
+      {/* Sheet konten shop */}
       <div className="relative z-10 min-h-screen bg-[#F4F2EC] px-6 pt-10 pb-16 shadow-[0_-24px_48px_rgba(0,0,0,0.18)]">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* Desktop Sidebar — borderless, menyatu dengan latar, pepet kiri */}
+          {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-24 pr-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-clash text-lg font-semibold tracking-wider text-neutral-900 uppercase flex items-center gap-2">
@@ -193,10 +191,9 @@ export default function ShopPage() {
             </div>
           </aside>
 
-          {/* Mobile Filter Toggle and Panel (shown on mobile/tablet) */}
+          {/* Mobile Filter Toggle and Panel */}
           <div className="w-full lg:hidden flex flex-col gap-4">
             <div className="flex gap-4">
-              {/* Mobile Filter Toggle */}
               <button
                 onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 border border-neutral-200 rounded-lg bg-white text-sm font-semibold text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition cursor-pointer"
@@ -210,7 +207,6 @@ export default function ShopPage() {
                 )}
               </button>
 
-              {/* Clear filters shortcut */}
               {hasActiveFilters && (
                 <button
                   onClick={handleResetFilters}
@@ -222,10 +218,8 @@ export default function ShopPage() {
               )}
             </div>
 
-            {/* Mobile Filters Accordion Panel */}
             {isMobileFiltersOpen && (
               <div className="w-full bg-white border border-neutral-200/80 rounded-xl p-5 shadow-sm space-y-5 animate-in fade-in slide-in-from-top-4 duration-200">
-                {/* Category selector */}
                 <div>
                   <h3 className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 mb-3">
                     Categories
@@ -253,7 +247,6 @@ export default function ShopPage() {
                   </div>
                 </div>
 
-                {/* Price Range */}
                 <div>
                   <h3 className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 mb-3">
                     Price Range ($)
@@ -288,9 +281,7 @@ export default function ShopPage() {
 
           {/* Shop Main Products Display Column */}
           <div className="flex-grow w-full min-w-0">
-            {/* Controls Bar: Search & Sort */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center mb-6 bg-white border border-neutral-200/80 rounded-xl p-4 shadow-sm">
-              {/* Search Input */}
               <div className="relative flex-1">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400">
                   <Search className="h-4 w-4" />
@@ -312,7 +303,6 @@ export default function ShopPage() {
                 )}
               </div>
 
-              {/* Sort Dropdown */}
               <div className="relative min-w-[180px]">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
                   Sort
@@ -334,13 +324,11 @@ export default function ShopPage() {
               </div>
             </div>
 
-            {/* Results count & current filters summary */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
               <p className="text-xs text-[#2E3A2C]/70 font-semibold uppercase tracking-wider">
                 Showing <span className="text-[#2E3A2C] font-bold">{sortedProducts.length}</span> of {allProducts.length} Instruments
               </p>
 
-              {/* Selected category tags if any */}
               {selectedCategories.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 items-center">
                   <span className="text-[10px] text-[#2E3A2C]/60 uppercase tracking-widest font-bold mr-1">Active:</span>
@@ -362,15 +350,17 @@ export default function ShopPage() {
               )}
             </div>
 
-            {/* Product Grid - Maximum 3 items per row */}
-            {sortedProducts.length > 0 ? (
+            {!loaded ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center text-neutral-400">
+                <p className="text-sm font-semibold uppercase tracking-wider">Loading instruments...</p>
+              </div>
+            ) : sortedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (
-              /* Empty State */
               <div className="flex flex-col items-center justify-center text-center py-20 bg-white border border-neutral-200/80 rounded-xl shadow-sm px-6">
                 <SlidersHorizontal className="h-12 w-12 text-neutral-300 mb-4" />
                 <h3 className="font-clash text-lg font-semibold text-neutral-900 uppercase tracking-wider">

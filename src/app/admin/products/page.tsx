@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useProductStore } from '@/store/productStore';
-import type { ProductInput } from '@/store/productStore';
+import type { ProductInput } from '@/lib/db/products';
 import type { Product } from '@/types';
-import { Plus, Pencil, Trash2, X, Search, RotateCcw } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Search, RotateCcw, Loader2, Database, HardDrive } from 'lucide-react';
 
 const EMPTY_FORM: ProductInput = {
   name: '',
@@ -15,27 +15,36 @@ const EMPTY_FORM: ProductInput = {
 };
 
 export default function AdminProductsPage() {
-  const { products, addProduct, updateProduct, deleteProduct, resetProducts } = useProductStore();
-  const [mounted, setMounted] = useState(false);
+  const {
+    products,
+    loading,
+    loaded,
+    dbMode,
+    loadProducts,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    resetProducts,
+  } = useProductStore();
+
   const [query, setQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ProductInput>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const list = mounted ? products : [];
+    loadProducts();
+  }, [loadProducts]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return list;
-    return list.filter(
+    if (!q) return products;
+    return products.filter(
       (p) =>
         p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
     );
-  }, [list, query]);
+  }, [products, query]);
 
   const openAdd = () => {
     setEditingId(null);
@@ -61,15 +70,40 @@ export default function AdminProductsPage() {
     setForm(EMPTY_FORM);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.category.trim()) return;
-    if (editingId) {
-      updateProduct(editingId, form);
-    } else {
-      addProduct(form);
+    setSaving(true);
+    try {
+      if (editingId) {
+        await updateProduct(editingId, form);
+      } else {
+        await addProduct(form);
+      }
+      closeForm();
+    } catch (err) {
+      alert((err as Error)?.message || 'Gagal menyimpan produk');
+    } finally {
+      setSaving(false);
     }
-    closeForm();
+  };
+
+  const handleDelete = async (p: Product) => {
+    if (!confirm(`Hapus \"${p.name}\"?`)) return;
+    try {
+      await deleteProduct(p.id);
+    } catch (err) {
+      alert((err as Error)?.message || 'Gagal menghapus produk');
+    }
+  };
+
+  const handleReset = async () => {
+    if (!confirm('Muat ulang / reset daftar produk?')) return;
+    try {
+      await resetProducts();
+    } catch (err) {
+      alert((err as Error)?.message || 'Gagal mereset produk');
+    }
   };
 
   const currency = (n: number) => '$' + n.toLocaleString('en-US');
@@ -89,13 +123,11 @@ export default function AdminProductsPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => {
-              if (confirm('Reset semua produk ke data awal? Perubahan Anda akan hilang.')) resetProducts();
-            }}
+            onClick={handleReset}
             className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-500 transition hover:text-neutral-900"
           >
             <RotateCcw className="h-3.5 w-3.5" />
-            Reset
+            {dbMode ? 'Refresh' : 'Reset'}
           </button>
           <button
             onClick={openAdd}
@@ -174,7 +206,8 @@ export default function AdminProductsPage() {
             <button type="button" onClick={closeForm} className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-600 hover:bg-neutral-50">
               Cancel
             </button>
-            <button type="submit" className="rounded-lg bg-sage-primary px-5 py-2 text-sm font-semibold text-white hover:bg-sage-secondary">
+            <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-sage-primary px-5 py-2 text-sm font-semibold text-white hover:bg-sage-secondary disabled:opacity-50">
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               {editingId ? 'Save Changes' : 'Create Product'}
             </button>
           </div>
@@ -194,7 +227,14 @@ export default function AdminProductsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
-              {filtered.length === 0 && (
+              {loading && !loaded && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-10 text-center text-neutral-400">
+                    <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</span>
+                  </td>
+                </tr>
+              )}
+              {loaded && filtered.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-4 py-10 text-center text-neutral-400">
                     No products found.
@@ -226,9 +266,7 @@ export default function AdminProductsPage() {
                         <Pencil className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm(`Hapus \"${p.name}\"?`)) deleteProduct(p.id);
-                        }}
+                        onClick={() => handleDelete(p)}
                         className="rounded-md p-2 text-neutral-500 transition hover:bg-red-50 hover:text-red-600"
                         aria-label="Delete"
                       >
@@ -243,9 +281,13 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      <p className="text-xs text-neutral-400">
-        Perubahan disimpan di browser (localStorage) dan langsung tampil di halaman Shop. Untuk persistensi permanen lintas perangkat, hubungkan ke tabel Supabase.
-      </p>
+      <div className="flex items-center gap-2 text-xs text-neutral-400">
+        {dbMode ? (
+          <span className="inline-flex items-center gap-1.5 text-sage-primary"><Database className="h-3.5 w-3.5" /> Tersambung Supabase — perubahan tersimpan permanen.</span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5"><HardDrive className="h-3.5 w-3.5" /> Mode lokal (localStorage) — isi NEXT_PUBLIC_SUPABASE_URL & ANON_KEY untuk menyimpan ke Supabase.</span>
+        )}
+      </div>
     </div>
   );
 }

@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { isAdminEmail } from '@/lib/admin';
+import { isSupabaseConfigured } from '@/lib/supabase';
+import { fetchOrdersDb } from '@/lib/db/orders';
+import type { Order } from '@/lib/db/orders';
 import { Users, ShoppingBag, ShieldCheck } from 'lucide-react';
 
 interface MockUser {
@@ -14,6 +17,7 @@ interface MockUser {
 export default function AdminUsersPage() {
   const { isMockMode } = useAuthStore();
   const [users, setUsers] = useState<MockUser[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -26,9 +30,26 @@ export default function AdminUsersPage() {
     } catch {
       setUsers([]);
     }
+    (async () => {
+      if (isSupabaseConfigured()) {
+        try {
+          setOrders(await fetchOrdersDb());
+        } catch {
+          // ignore
+        }
+      }
+    })();
   }, []);
 
   if (!mounted) return null;
+
+  const currency = (n: number) => '$' + n.toLocaleString('en-US');
+
+  const statusColor = (status: string) => {
+    if (status === 'paid') return 'bg-green-100 text-green-700';
+    if (status === 'failed') return 'bg-red-100 text-red-700';
+    return 'bg-amber-100 text-amber-700';
+  };
 
   return (
     <div className="space-y-8">
@@ -96,14 +117,62 @@ export default function AdminUsersPage() {
           <h2 className="font-clash text-lg font-semibold uppercase tracking-wider text-neutral-900">
             Orders
           </h2>
+          <span className="ml-auto rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-neutral-600">
+            {orders.length}
+          </span>
         </div>
-        <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
-          <ShoppingBag className="h-10 w-10 text-neutral-300" />
-          <p className="mt-3 text-sm font-medium text-neutral-600">Belum ada sistem pesanan persisten</p>
-          <p className="mt-1 max-w-md text-xs text-neutral-400">
-            Checkout saat ini memakai Midtrans tanpa menyimpan riwayat pesanan. Tambahkan tabel orders di Supabase untuk mulai mencatat dan menampilkan pesanan di sini.
-          </p>
-        </div>
+
+        {!isSupabaseConfigured() ? (
+          <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+            <ShoppingBag className="h-10 w-10 text-neutral-300" />
+            <p className="mt-3 text-sm font-medium text-neutral-600">Supabase belum terkonfigurasi</p>
+            <p className="mt-1 max-w-md text-xs text-neutral-400">
+              Isi NEXT_PUBLIC_SUPABASE_URL & ANON_KEY dan jalankan supabase/schema.sql untuk mulai mencatat pesanan dari checkout.
+            </p>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+            <ShoppingBag className="h-10 w-10 text-neutral-300" />
+            <p className="mt-3 text-sm font-medium text-neutral-600">Belum ada pesanan</p>
+            <p className="mt-1 max-w-md text-xs text-neutral-400">
+              Pesanan akan muncul di sini setiap kali pelanggan melakukan checkout.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-neutral-200 bg-neutral-50 text-[11px] uppercase tracking-wider text-neutral-500">
+                <tr>
+                  <th className="px-6 py-3 font-semibold">Order</th>
+                  <th className="px-6 py-3 font-semibold">Customer</th>
+                  <th className="px-6 py-3 font-semibold">Total</th>
+                  <th className="px-6 py-3 font-semibold">Status</th>
+                  <th className="px-6 py-3 font-semibold">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100">
+                {orders.map((o) => (
+                  <tr key={o.id} className="hover:bg-neutral-50">
+                    <td className="px-6 py-3 font-mono text-xs text-neutral-700">{o.id}</td>
+                    <td className="px-6 py-3">
+                      <p className="font-medium text-neutral-900">{o.customer_name}</p>
+                      <p className="text-xs text-neutral-500">{o.customer_email}</p>
+                    </td>
+                    <td className="px-6 py-3 font-semibold text-neutral-900">{currency(o.total)}</td>
+                    <td className="px-6 py-3">
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor(o.status)}`}>
+                        {o.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3 text-xs text-neutral-500">
+                      {new Date(o.created_at).toLocaleString('id-ID')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
