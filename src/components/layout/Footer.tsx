@@ -10,6 +10,8 @@ export default function Footer() {
 
   const pathname = usePathname();
   const isHome = pathname === '/';
+  // Halaman shop memakai hero fixed; footer harus rapat (tanpa margin) agar hero tidak menyembul di celah.
+  const isShop = pathname === '/shop';
 
   useEffect(() => {
     if (!isHome) {
@@ -78,7 +80,7 @@ export default function Footer() {
     <footer
       ref={footerOuterRef}
       className={`w-full bg-black text-sage-secondary select-none font-sans relative overflow-visible z-50 ${
-        isHome ? '-mt-24' : 'mt-16'
+        isHome ? '-mt-24' : isShop ? 'mt-0' : 'mt-16'
       }`}
     >
       {/* Cloud Transition Asset Wrapper for Parallax (height 0 to avoid blank layout space) */}
