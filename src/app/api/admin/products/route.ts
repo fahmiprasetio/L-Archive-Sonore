@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/server-auth';
+import { validateNewProduct, validateProductUpdates, isNonEmptyString } from '@/lib/validation';
+import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -11,20 +13,25 @@ function notConfigured() {
   );
 }
 
+function limited(request: Request) {
+  const ip = getClientIp(request);
+  return rateLimit(`admin-products:${ip}`, 60, 60_000);
+}
+
 export async function POST(request: Request) {
   if (!supabaseAdmin) return notConfigured();
+  const rl = limited(request);
+  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const body = await request.json();
+  const body = await request.json().catch(() => null);
+  const result = validateNewProduct(body);
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
+
   const payload = {
     id: `p_${Date.now()}`,
-    name: body.name,
-    description: body.description ?? '',
-    price: Number(body.price) || 0,
-    image_url: body.image_url ?? '',
-    category: body.category ?? '',
-    stock: typeof body.stock === 'number' ? body.stock : 0,
+    ...result.value,
   };
   const { data, error } = await supabaseAdmin
     .from('products')
@@ -37,16 +44,22 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   if (!supabaseAdmin) return notConfigured();
+  const rl = limited(request);
+  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const body = await request.json();
-  const { id, updates } = body;
-  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+  const body = await request.json().catch(() => null);
+  if (!body || !isNonEmptyString(body.id)) {
+    return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+  }
+  const result = validateProductUpdates(body.updates);
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
+
   const { data, error } = await supabaseAdmin
     .from('products')
-    .update(updates || {})
-    .eq('id', id)
+    .update(result.value)
+    .eq('id', body.id)
     .select()
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -55,13 +68,16 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   if (!supabaseAdmin) return notConfigured();
+  const rl = limited(request);
+  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const body = await request.json().catch(() => ({}));
-  const id = body.id;
-  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-  const { error } = await supabaseAdmin.from('products').delete().eq('id', id);
+  if (!isNonEmptyString(body.id)) {
+    return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+  }
+  const { error } = await supabaseAdmin.from('products').delete().eq('id', body.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

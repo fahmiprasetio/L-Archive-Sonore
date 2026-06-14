@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/server-auth';
+import { isNonEmptyString } from '@/lib/validation';
+import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -14,6 +16,11 @@ const ALLOWED_STATUSES = [
   'failed',
 ];
 
+function limited(request: Request) {
+  const ip = getClientIp(request);
+  return rateLimit(`admin-orders:${ip}`, 60, 60_000);
+}
+
 export async function GET(request: Request) {
   if (!supabaseAdmin) {
     return NextResponse.json(
@@ -21,6 +28,8 @@ export async function GET(request: Request) {
       { status: 503 }
     );
   }
+  const rl = limited(request);
+  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -40,6 +49,8 @@ export async function PUT(request: Request) {
       { status: 503 }
     );
   }
+  const rl = limited(request);
+  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -51,7 +62,7 @@ export async function PUT(request: Request) {
   }
 
   const { id, status } = body;
-  if (!id || !status) {
+  if (!isNonEmptyString(id) || !isNonEmptyString(status)) {
     return NextResponse.json({ error: 'Missing order id or status' }, { status: 400 });
   }
   if (!ALLOWED_STATUSES.includes(status)) {

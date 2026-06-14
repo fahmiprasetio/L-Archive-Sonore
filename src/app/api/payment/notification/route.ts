@@ -1,14 +1,25 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { validateMidtransNotification } from '@/lib/validation';
+import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
 // Webhook (Payment Notification) dari Midtrans.
 // Set URL ini di dashboard Midtrans: https://<domain>/api/payment/notification
 export async function POST(request: Request) {
+  // Rate limit longgar untuk webhook: 120 permintaan per menit per IP.
+  const ip = getClientIp(request);
+  const rl = rateLimit(`midtrans-notif:${ip}`, 120, 60_000);
+  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
+
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+    const parsed = validateMidtransNotification(body);
+    if (!parsed.ok) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 });
+    }
     const {
       order_id,
       status_code,
@@ -16,7 +27,7 @@ export async function POST(request: Request) {
       signature_key,
       transaction_status,
       fraud_status,
-    } = body;
+    } = parsed.value;
 
     const serverKey = process.env.MIDTRANS_SERVER_KEY || '';
 

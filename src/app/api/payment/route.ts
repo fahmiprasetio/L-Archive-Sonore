@@ -2,29 +2,41 @@ import { NextResponse } from 'next/server';
 import { snap } from '@/lib/midtrans';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getUserFromRequest } from '@/lib/server-auth';
-import { CartItem } from '@/types';
+import { validateCartItems, validateCustomerDetails } from '@/lib/validation';
+import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+  // Rate limit: 10 permintaan checkout per menit per IP.
+  const ip = getClientIp(request);
+  const rl = rateLimit(`payment:${ip}`, 10, 60_000);
+  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
+
   try {
-    const body = await request.json();
-    const { items, customerDetails } = body;
-
-    if (!items || items.length === 0) {
-      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    if (!customerDetails || !customerDetails.name || !customerDetails.email) {
-      return NextResponse.json({ error: 'Missing customer details' }, { status: 400 });
+    const itemsResult = validateCartItems(body.items);
+    if (!itemsResult.ok) {
+      return NextResponse.json({ error: itemsResult.error }, { status: 400 });
     }
+    const customerResult = validateCustomerDetails(body.customerDetails);
+    if (!customerResult.ok) {
+      return NextResponse.json({ error: customerResult.error }, { status: 400 });
+    }
+
+    const items = itemsResult.value;
+    const customerDetails = customerResult.value;
 
     // Generate a unique order ID
     const orderId = `LARCHIVE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     // Calculate gross amount
     const grossAmount = items.reduce(
-      (sum: number, item: CartItem) => sum + item.product.price * item.quantity,
+      (sum, item) => sum + item.product.price * item.quantity,
       0
     );
 
@@ -47,7 +59,7 @@ export async function POST(request: Request) {
           address: customerDetails.address || '',
         },
       },
-      item_details: items.map((item: CartItem) => ({
+      item_details: items.map((item) => ({
         id: item.product.id,
         price: item.product.price,
         quantity: item.quantity,
@@ -68,7 +80,7 @@ export async function POST(request: Request) {
           customer_name: customerDetails.name,
           customer_email: customerDetails.email,
           customer_address: customerDetails.address || '',
-          items: items.map((item: CartItem) => ({
+          items: items.map((item) => ({
             id: item.product.id,
             name: item.product.name,
             price: item.product.price,
