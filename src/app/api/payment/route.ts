@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getUserFromRequest } from '@/lib/server-auth';
 import { validateCartItems, validateCustomerDetails } from '@/lib/validation';
 import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
+import { calcShipping, calcTax } from '@/lib/pricing';
 
 export const runtime = 'nodejs';
 
@@ -75,11 +76,31 @@ export async function POST(request: Request) {
     // Generate a unique order ID
     const orderId = `LARCHIVE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-    // Calculate gross amount
-    const grossAmount = items.reduce(
+    // Hitung subtotal, ongkir, pajak. gross_amount = subtotal + shipping + tax.
+    const subtotal = items.reduce(
       (sum, item) => sum + item.product.price * item.quantity,
       0
     );
+    const shipping = calcShipping(subtotal);
+    const tax = calcTax(subtotal);
+    const grossAmount = subtotal + shipping + tax;
+
+    // item_details harus berjumlah sama dengan gross_amount (syarat Midtrans),
+    // jadi ongkir & pajak ditambahkan sebagai baris tersendiri.
+    const itemDetails: Array<{ id: string; price: number; quantity: number; name: string }> = items.map(
+      (item) => ({
+        id: item.product.id,
+        price: item.product.price,
+        quantity: item.quantity,
+        name: item.product.name.substring(0, 50), // Midtrans character limit
+      })
+    );
+    if (shipping > 0) {
+      itemDetails.push({ id: 'SHIPPING', price: shipping, quantity: 1, name: 'Shipping' });
+    }
+    if (tax > 0) {
+      itemDetails.push({ id: 'TAX', price: tax, quantity: 1, name: 'Tax (PPN 11%)' });
+    }
 
     // Prepare transaction payload for Midtrans
     const parameter = {
@@ -100,12 +121,7 @@ export async function POST(request: Request) {
           address: customerDetails.address || '',
         },
       },
-      item_details: items.map((item) => ({
-        id: item.product.id,
-        price: item.product.price,
-        quantity: item.quantity,
-        name: item.product.name.substring(0, 50), // Midtrans character limit
-      })),
+      item_details: itemDetails,
     };
 
     // Call Midtrans Snap API to get transaction token and redirect url

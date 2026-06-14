@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Minus, Plus, Trash2, ArrowLeft, ShoppingBag, AlertTriangle } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
+import { calcOrderSummary, FREE_SHIPPING_THRESHOLD } from '@/lib/pricing';
 
 // Batas stok produk (Infinity bila stok tidak diketahui).
 function stockOf(stock?: number): number {
@@ -13,6 +14,7 @@ export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart, getTotalPrice } = useCartStore();
 
   const totalPrice = getTotalPrice();
+  const summary = calcOrderSummary(totalPrice);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   // Item yang bermasalah stok: habis (0) atau kuantitas melebihi stok.
@@ -165,15 +167,28 @@ export default function CartPage() {
             </div>
             <div className="flex justify-between text-neutral-600">
               <span>Subtotal</span>
-              <span className="font-semibold text-neutral-900">${totalPrice.toLocaleString('en-US')}</span>
+              <span className="font-semibold text-neutral-900">${summary.subtotal.toLocaleString('en-US')}</span>
             </div>
             <div className="flex justify-between text-neutral-600">
               <span>Shipping</span>
-              <span className="text-green-600 font-semibold">Free</span>
+              {summary.shipping === 0 ? (
+                <span className="text-green-600 font-semibold">Free</span>
+              ) : (
+                <span className="font-semibold text-neutral-900">${summary.shipping.toLocaleString('en-US')}</span>
+              )}
+            </div>
+            {summary.shipping > 0 && (
+              <p className="text-xs text-sage-primary">
+                Tambah ${(FREE_SHIPPING_THRESHOLD - summary.subtotal).toLocaleString('en-US')} lagi untuk gratis ongkir
+              </p>
+            )}
+            <div className="flex justify-between text-neutral-600">
+              <span>Tax (PPN 11%)</span>
+              <span className="font-semibold text-neutral-900">${summary.tax.toLocaleString('en-US')}</span>
             </div>
             <div className="border-t border-gray-100 pt-3 flex justify-between text-base font-bold text-neutral-900">
               <span>Total Price</span>
-              <span>${totalPrice.toLocaleString('en-US')}</span>
+              <span>${summary.total.toLocaleString('en-US')}</span>
             </div>
           </div>
 
