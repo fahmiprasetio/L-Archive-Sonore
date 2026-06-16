@@ -2,7 +2,7 @@
 
 import { use, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Minus, Plus } from 'lucide-react';
+import { ArrowLeft, Minus, Plus, ZoomIn } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useProductStore } from '@/store/productStore';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
@@ -11,6 +11,7 @@ import WishlistButton from '@/components/product/WishlistButton';
 import ProductReviews from '@/components/product/ProductReviews';
 import ProductCard from '@/components/product/ProductCard';
 import ProductDetailSkeleton from '@/components/product/ProductDetailSkeleton';
+import ImageLightbox from '@/components/product/ImageLightbox';
 import type { Product } from '@/types';
 
 interface PageProps {
@@ -31,6 +32,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -39,6 +41,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   // Reset gambar aktif saat berpindah produk.
   useEffect(() => {
     setActiveImage(0);
+    setLightboxOpen(false);
   }, [id]);
 
   const product = useMemo<ProductWithSpecs | undefined>(() => {
@@ -120,7 +123,13 @@ export default function ProductDetailPage({ params }: PageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white border border-gray-200 rounded-lg p-6">
         <div className="space-y-3">
-          <div className="aspect-square w-full rounded bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(true)}
+            disabled={!activeSrc}
+            className="group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded bg-gray-100 text-gray-400 enabled:cursor-zoom-in"
+            aria-label="Perbesar gambar"
+          >
             {activeSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -131,7 +140,12 @@ export default function ProductDetailPage({ params }: PageProps) {
             ) : (
               <span>No Image</span>
             )}
-          </div>
+            {activeSrc && (
+              <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
+                <ZoomIn className="h-3.5 w-3.5" /> Zoom
+              </span>
+            )}
+          </button>
 
           {gallery.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
@@ -264,6 +278,16 @@ export default function ProductDetailPage({ params }: PageProps) {
       )}
 
       <ProductReviews productId={product.id} productName={product.name} />
+
+      {lightboxOpen && (
+        <ImageLightbox
+          images={gallery}
+          index={activeImage}
+          alt={product.name}
+          onClose={() => setLightboxOpen(false)}
+          onIndexChange={setActiveImage}
+        />
+      )}
     </div>
   );
 }
