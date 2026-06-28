@@ -32,69 +32,86 @@ export async function POST(request: Request) {
     const items = itemsResult.value;
     const customerDetails = customerResult.value;
 
-    // Validasi stok terhadap data terbaru di database (otoritatif).
-    // Mencegah pembelian melebihi stok walau data di keranjang sudah basi.
-    if (supabaseAdmin) {
-      const ids = items.map((item) => item.product.id);
-      const { data: dbProducts, error: stockErr } = await supabaseAdmin
-        .from('products')
-        .select('id, name, stock')
-        .in('id', ids);
+    // PENTING (keamanan): harga & stok HARUS diambil dari database sebagai
+    // sumber otoritatif. Jangan pernah mempercayai harga yang dikirim klien —
+    // kalau tidak, pembeli bisa mengubah harga di browser (mis. price: 1) dan
+    // membayar jauh lebih murah dari seharusnya.
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Server belum dikonfigurasi (Supabase service role).' },
+        { status: 500 }
+      );
+    }
 
-      if (stockErr) {
-        console.error('Gagal memeriksa stok:', stockErr);
-        return NextResponse.json(
-          { error: 'Gagal memeriksa stok produk. Coba lagi.' },
-          { status: 500 }
-        );
-      }
+    const ids = items.map((item) => item.product.id);
+    const { data: dbProducts, error: dbErr } = await supabaseAdmin
+      .from('products')
+      .select('id, name, price, stock')
+      .in('id', ids);
 
-      const dbMap = new Map((dbProducts ?? []).map((p) => [p.id, p]));
-      const issues: string[] = [];
-      for (const item of items) {
-        const dbp = dbMap.get(item.product.id);
-        if (!dbp) {
-          issues.push(`Produk \"${item.product.name}\" sudah tidak tersedia`);
-          continue;
-        }
-        const stock = typeof dbp.stock === 'number' ? dbp.stock : 0;
-        if (stock <= 0) {
-          issues.push(`\"${dbp.name}\" sedang habis`);
-        } else if (item.quantity > stock) {
-          issues.push(`\"${dbp.name}\" hanya tersisa ${stock} (diminta ${item.quantity})`);
-        }
-      }
+    if (dbErr) {
+      console.error('Gagal memeriksa produk:', dbErr);
+      return NextResponse.json(
+        { error: 'Gagal memeriksa produk. Coba lagi.' },
+        { status: 500 }
+      );
+    }
 
-      if (issues.length > 0) {
-        return NextResponse.json(
-          { error: `Stok tidak mencukupi: ${issues.join('; ')}` },
-          { status: 409 }
-        );
+    const dbMap = new Map((dbProducts ?? []).map((p) => [p.id, p]));
+
+    // Validasi ketersediaan + stok terhadap data terbaru (otoritatif).
+    const issues: string[] = [];
+    for (const item of items) {
+      const dbp = dbMap.get(item.product.id);
+      if (!dbp) {
+        issues.push(`Produk \"${item.product.name}\" sudah tidak tersedia`);
+        continue;
       }
+      const stock = typeof dbp.stock === 'number' ? dbp.stock : 0;
+      if (stock <= 0) {
+        issues.push(`\"${dbp.name}\" sedang habis`);
+      } else if (item.quantity > stock) {
+        issues.push(`\"${dbp.name}\" hanya tersisa ${stock} (diminta ${item.quantity})`);
+      }
+    }
+
+    if (issues.length > 0) {
+      return NextResponse.json(
+        { error: `Stok tidak mencukupi: ${issues.join('; ')}` },
+        { status: 409 }
+      );
     }
 
     // Generate a unique order ID
     const orderId = `LARCHIVE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
+    // Bangun line items dari HARGA DATABASE (bukan harga klien).
+    const lineItems = items.map((item) => {
+      const dbp = dbMap.get(item.product.id)!;
+      const price = typeof dbp.price === 'number' ? dbp.price : Number(dbp.price) || 0;
+      return {
+        id: dbp.id,
+        name: String(dbp.name),
+        price,
+        quantity: item.quantity,
+      };
+    });
+
     // Hitung subtotal, ongkir, pajak. gross_amount = subtotal + shipping + tax.
-    const subtotal = items.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
-      0
-    );
+    const subtotal = lineItems.reduce((sum, li) => sum + li.price * li.quantity, 0);
     const shipping = calcShipping(subtotal);
     const tax = calcTax(subtotal);
     const grossAmount = subtotal + shipping + tax;
 
     // item_details harus berjumlah sama dengan gross_amount (syarat Midtrans),
     // jadi ongkir & pajak ditambahkan sebagai baris tersendiri.
-    const itemDetails: Array<{ id: string; price: number; quantity: number; name: string }> = items.map(
-      (item) => ({
-        id: item.product.id,
-        price: item.product.price,
-        quantity: item.quantity,
-        name: item.product.name.substring(0, 50), // Midtrans character limit
-      })
-    );
+    const itemDetails: Array<{ id: string; price: number; quantity: number; name: string }> =
+      lineItems.map((li) => ({
+        id: li.id,
+        price: li.price,
+        quantity: li.quantity,
+        name: li.name.substring(0, 50), // Midtrans character limit
+      }));
     if (shipping > 0) {
       itemDetails.push({ id: 'SHIPPING', price: shipping, quantity: 1, name: 'Shipping' });
     }
@@ -128,27 +145,26 @@ export async function POST(request: Request) {
     const transaction = await snap.createTransaction(parameter);
 
     // Catat order (status pending) memakai service-role. user_id diisi bila login.
-    if (supabaseAdmin) {
-      try {
-        const user = await getUserFromRequest(request);
-        await supabaseAdmin.from('orders').insert({
-          id: orderId,
-          user_id: user?.id ?? null,
-          customer_name: customerDetails.name,
-          customer_email: customerDetails.email,
-          customer_address: customerDetails.address || '',
-          items: items.map((item) => ({
-            id: item.product.id,
-            name: item.product.name,
-            price: item.product.price,
-            quantity: item.quantity,
-          })),
-          total: grossAmount,
-          status: 'pending',
-        });
-      } catch (e) {
-        console.error('Gagal mencatat order ke Supabase:', e);
-      }
+    // Snapshot order memakai harga database (otoritatif), bukan harga klien.
+    try {
+      const user = await getUserFromRequest(request);
+      await supabaseAdmin.from('orders').insert({
+        id: orderId,
+        user_id: user?.id ?? null,
+        customer_name: customerDetails.name,
+        customer_email: customerDetails.email,
+        customer_address: customerDetails.address || '',
+        items: lineItems.map((li) => ({
+          id: li.id,
+          name: li.name,
+          price: li.price,
+          quantity: li.quantity,
+        })),
+        total: grossAmount,
+        status: 'pending',
+      });
+    } catch (e) {
+      console.error('Gagal mencatat order ke Supabase:', e);
     }
 
     return NextResponse.json({
