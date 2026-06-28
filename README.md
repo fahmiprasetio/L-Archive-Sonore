@@ -17,7 +17,7 @@ L'Archive Sonore is a portfolio project focused on building a **secure, producti
 
 ## 🔗 Live Demo
 
-- **Live site:** _add your Vercel URL here_
+- **Live site:** <https://l-archive-sonore.vercel.app/>
 - **Payments:** test with [Midtrans Sandbox cards](https://docs.midtrans.com/docs/testing-payment-on-sandbox) (e.g. `4811 1111 1111 1114`).
 
 > 📸 _Add a few screenshots/GIFs (storefront, checkout, admin) here._
@@ -113,27 +113,3 @@ https://<your-domain>/api/payment/notification
 | `npm run build` | Production build. |
 | `npm run start` | Run the production build. |
 | `npm run lint` | Lint with ESLint. |
-
----
-
-## ☁️ Deployment (Vercel)
-
-1. Import the repository into Vercel.
-2. Add the environment variables (mark secrets as _Sensitive_; leave `NEXT_PUBLIC_*` values non-sensitive).
-3. Redeploy after any change, then set the Midtrans Payment Notification URL to your deployed `/api/payment/notification`.
-
----
-
-## 🗺️ Roadmap
-
-- [x] Error monitoring (Sentry)
-- [ ] Automated tests + CI
-- [ ] Order tracking page + payment confirmation emails
-- [ ] Search, category filters, and price sorting
-- [ ] Coupons / discounts
-
----
-
-## 👤 Author
-
-**Naufal Fahmi Prasetio** — built as a full-stack portfolio project.
