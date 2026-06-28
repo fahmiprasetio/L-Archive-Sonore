@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/server-auth';
 import { isNonEmptyString } from '@/lib/validation';
 import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
+import { readJsonLimited } from '@/lib/body-limit';
 
 export const runtime = 'nodejs';
 
@@ -54,12 +55,11 @@ export async function PUT(request: Request) {
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  let body: { id?: string; status?: string };
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  const bodyResult = await readJsonLimited<{ id?: string; status?: string }>(request);
+  if (!bodyResult.ok) {
+    return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
   }
+  const body = bodyResult.value;
 
   const { id, status } = body;
   if (!isNonEmptyString(id) || !isNonEmptyString(status)) {

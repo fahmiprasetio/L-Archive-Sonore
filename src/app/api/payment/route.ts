@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getUserFromRequest } from '@/lib/server-auth';
 import { validateCartItems, validateCustomerDetails } from '@/lib/validation';
 import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
+import { readJsonLimited } from '@/lib/body-limit';
 import { calcShipping, calcTax } from '@/lib/pricing';
 
 export const runtime = 'nodejs';
@@ -15,10 +16,12 @@ export async function POST(request: Request) {
   if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
 
   try {
-    const body = await request.json().catch(() => null);
-    if (!body) {
-      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    // Baca body dengan batas ukuran (mitigasi payload abuse).
+    const bodyResult = await readJsonLimited<any>(request);
+    if (!bodyResult.ok) {
+      return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
     }
+    const body = bodyResult.value;
 
     const itemsResult = validateCartItems(body.items);
     if (!itemsResult.ok) {
