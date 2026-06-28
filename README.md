@@ -1,7 +1,5 @@
 # 🎵 L'Archive Sonore
 
-> A full-stack e-commerce concept for premium musical instruments — guitars, pianos, drums, synthesizers, violins, and more.
-
 L'Archive Sonore is a portfolio project focused on building a **secure, production-minded** online store: server-authoritative pricing, atomic stock handling, signature-verified payment webhooks, and a hardened HTTP layer.
 
 <p align="left">
@@ -19,8 +17,6 @@ L'Archive Sonore is a portfolio project focused on building a **secure, producti
 
 - **Live site:** <https://l-archive-sonore.vercel.app/>
 - **Payments:** test with [Midtrans Sandbox cards](https://docs.midtrans.com/docs/testing-payment-on-sandbox) (e.g. `4811 1111 1111 1114`).
-
-> 📸 _Add a few screenshots/GIFs (storefront, checkout, admin) here._
 
 ---
 
