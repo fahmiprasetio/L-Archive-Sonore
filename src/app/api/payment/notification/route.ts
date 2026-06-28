@@ -69,18 +69,17 @@ export async function POST(request: Request) {
         .select('id, items');
 
       const justPaid = updated && updated.length > 0 ? updated[0] : null;
-      if (justPaid && Array.isArray(justPaid.items)) {
-        for (const item of justPaid.items) {
-          const { data: prod } = await supabaseAdmin
-            .from('products')
-            .select('stock')
-            .eq('id', item.id)
-            .single();
-          if (prod) {
-            const current = typeof prod.stock === 'number' ? prod.stock : 0;
-            const newStock = Math.max(0, current - (item.quantity || 0));
-            await supabaseAdmin.from('products').update({ stock: newStock }).eq('id', item.id);
-          }
+      if (justPaid && Array.isArray(justPaid.items) && justPaid.items.length > 0) {
+        // Pengurangan stok ATOMIK lewat Postgres function decrement_product_stock.
+        // Setiap baris dikunci & dikurangi dalam satu statement SQL, sehingga aman
+        // dari race condition saat banyak checkout produk yang sama bersamaan
+        // (menggantikan pola read-then-write lama yang rawan overselling).
+        const { error: stockErr } = await supabaseAdmin.rpc('decrement_product_stock', {
+          p_items: justPaid.items,
+        });
+        if (stockErr) {
+          // Order sudah 'paid'; jangan gagalkan webhook. Catat untuk ditindaklanjuti.
+          console.error('Gagal mengurangi stok (atomic RPC):', stockErr);
         }
       }
     } else {
