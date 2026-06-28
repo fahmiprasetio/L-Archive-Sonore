@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useProductStore } from '@/store/productStore';
 import type { ProductInput } from '@/lib/db/products';
 import type { Product } from '@/types';
-import { Plus, Pencil, Trash2, X, Search, RotateCcw, Loader2, Database, HardDrive } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Search, RotateCcw, Loader2, Database, HardDrive, Check, Minus } from 'lucide-react';
 
 const EMPTY_FORM: ProductInput = {
   name: '',
@@ -35,6 +35,11 @@ export default function AdminProductsPage() {
   const [form, setForm] = useState<ProductInput>(EMPTY_FORM);
   const [galleryText, setGalleryText] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Edit stok cepat (inline) di tabel.
+  const [stockEditId, setStockEditId] = useState<string | null>(null);
+  const [stockDraft, setStockDraft] = useState(0);
+  const [stockSaving, setStockSaving] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -120,6 +125,33 @@ export default function AdminProductsPage() {
       await resetProducts();
     } catch (err) {
       alert((err as Error)?.message || 'Gagal mereset produk');
+    }
+  };
+
+  const beginStockEdit = (p: Product) => {
+    setStockEditId(p.id);
+    setStockDraft(p.stock ?? 0);
+  };
+
+  const cancelStockEdit = () => {
+    setStockEditId(null);
+    setStockDraft(0);
+  };
+
+  const saveStock = async (p: Product) => {
+    const next = Math.max(0, Math.round(Number(stockDraft) || 0));
+    if (next === (p.stock ?? 0)) {
+      cancelStockEdit();
+      return;
+    }
+    setStockSaving(true);
+    try {
+      await updateProduct(p.id, { stock: next });
+    } catch (err) {
+      alert((err as Error)?.message || 'Gagal memperbarui stok');
+    } finally {
+      setStockSaving(false);
+      setStockEditId(null);
     }
   };
 
@@ -282,6 +314,7 @@ export default function AdminProductsPage() {
               )}
               {filtered.map((p) => {
                 const stock = typeof p.stock === 'number' ? p.stock : null;
+                const editing = stockEditId === p.id;
                 return (
                   <tr key={p.id} className="hover:bg-neutral-50">
                     <td className="px-4 py-3">
@@ -298,14 +331,75 @@ export default function AdminProductsPage() {
                     <td className="px-4 py-3 text-neutral-600">{p.category}</td>
                     <td className="px-4 py-3 font-semibold text-neutral-900">{currency(p.price)}</td>
                     <td className="px-4 py-3">
-                      {stock === null ? (
-                        <span className="text-neutral-400">—</span>
-                      ) : stock <= 0 ? (
-                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Sold out</span>
-                      ) : stock <= 3 ? (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">{stock} left</span>
+                      {editing ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setStockDraft((v) => Math.max(0, v - 1))}
+                            className="rounded-md border border-neutral-200 p-1 text-neutral-500 transition hover:bg-neutral-50"
+                            aria-label="Kurangi stok"
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </button>
+                          <input
+                            type="number"
+                            min={0}
+                            value={stockDraft}
+                            autoFocus
+                            onChange={(e) => setStockDraft(Number(e.target.value))}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveStock(p);
+                              if (e.key === 'Escape') cancelStockEdit();
+                            }}
+                            className="w-16 rounded-md border border-neutral-200 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-sage-primary"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setStockDraft((v) => v + 1)}
+                            className="rounded-md border border-neutral-200 p-1 text-neutral-500 transition hover:bg-neutral-50"
+                            aria-label="Tambah stok"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={stockSaving}
+                            onClick={() => saveStock(p)}
+                            className="rounded-md p-1 text-green-600 transition hover:bg-green-50 disabled:opacity-50"
+                            aria-label="Simpan stok"
+                          >
+                            {stockSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelStockEdit}
+                            className="rounded-md p-1 text-neutral-400 transition hover:bg-neutral-100"
+                            aria-label="Batal"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
                       ) : (
-                        <span className="text-neutral-700">{stock}</span>
+                        <button
+                          type="button"
+                          onClick={() => beginStockEdit(p)}
+                          disabled={stock === null}
+                          className="group inline-flex items-center gap-1.5 disabled:cursor-not-allowed"
+                          title="Klik untuk ubah stok"
+                        >
+                          {stock === null ? (
+                            <span className="text-neutral-400">—</span>
+                          ) : stock <= 0 ? (
+                            <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Sold out</span>
+                          ) : stock <= 3 ? (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">{stock} left</span>
+                          ) : (
+                            <span className="text-neutral-700">{stock}</span>
+                          )}
+                          {stock !== null && (
+                            <Pencil className="h-3 w-3 text-neutral-300 opacity-0 transition group-hover:opacity-100" />
+                          )}
+                        </button>
                       )}
                     </td>
                     <td className="px-4 py-3">
