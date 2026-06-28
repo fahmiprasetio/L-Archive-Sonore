@@ -60,7 +60,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const dbMap = new Map((dbProducts ?? []).map((p) => [p.id, p]));
+    interface DBProduct {
+      id: string;
+      name: string;
+      price: number;
+      stock: number;
+    }
+
+    const dbMap = new Map<string, DBProduct>(
+      ((dbProducts as DBProduct[] | null) ?? []).map((p) => [p.id, p])
+    );
 
     // Validasi ketersediaan + stok terhadap data terbaru (otoritatif).
     const issues: string[] = [];
