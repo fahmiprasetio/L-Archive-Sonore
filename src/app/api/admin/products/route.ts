@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/server-auth';
 import { validateNewProduct, validateProductUpdates, isNonEmptyString } from '@/lib/validation';
 import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
+import { readJsonLimited } from '@/lib/body-limit';
 
 export const runtime = 'nodejs';
 
@@ -25,8 +26,9 @@ export async function POST(request: Request) {
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const body = await request.json().catch(() => null);
-  const result = validateNewProduct(body);
+  const bodyResult = await readJsonLimited(request);
+  if (!bodyResult.ok) return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
+  const result = validateNewProduct(bodyResult.value);
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
 
   const payload = {
@@ -49,7 +51,9 @@ export async function PUT(request: Request) {
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const body = await request.json().catch(() => null);
+  const bodyResult = await readJsonLimited<any>(request);
+  if (!bodyResult.ok) return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
+  const body = bodyResult.value;
   if (!body || !isNonEmptyString(body.id)) {
     return NextResponse.json({ error: 'Missing id' }, { status: 400 });
   }
@@ -73,8 +77,10 @@ export async function DELETE(request: Request) {
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const body = await request.json().catch(() => ({}));
-  if (!isNonEmptyString(body.id)) {
+  const bodyResult = await readJsonLimited<any>(request);
+  if (!bodyResult.ok) return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
+  const body = bodyResult.value;
+  if (!isNonEmptyString(body?.id)) {
     return NextResponse.json({ error: 'Missing id' }, { status: 400 });
   }
   const { error } = await supabaseAdmin.from('products').delete().eq('id', body.id);

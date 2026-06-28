@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { validateMidtransNotification } from '@/lib/validation';
 import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
+import { readJsonLimited } from '@/lib/body-limit';
 
 export const runtime = 'nodejs';
 
@@ -15,8 +16,12 @@ export async function POST(request: Request) {
   if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
 
   try {
-    const body = await request.json().catch(() => null);
-    const parsed = validateMidtransNotification(body);
+    // Baca body dengan batas ukuran (mitigasi payload abuse).
+    const bodyResult = await readJsonLimited(request);
+    if (!bodyResult.ok) {
+      return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
+    }
+    const parsed = validateMidtransNotification(bodyResult.value);
     if (!parsed.ok) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
