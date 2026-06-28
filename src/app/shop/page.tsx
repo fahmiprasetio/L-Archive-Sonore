@@ -1,19 +1,63 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { Suspense, useState, useMemo, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal, RotateCcw, X, ChevronDown } from 'lucide-react';
 import type { Product } from '@/types';
 import { useProductStore } from '@/store/productStore';
 import ProductCard from '@/components/product/ProductCard';
 import ProductCardSkeleton from '@/components/product/ProductCardSkeleton';
 
-export default function ShopPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [minPrice, setMinPrice] = useState<number | ''>('');
-  const [maxPrice, setMaxPrice] = useState<number | ''>('');
-  const [sortBy, setSortBy] = useState('default');
+const VALID_SORTS = ['default', 'price-asc', 'price-desc', 'name-asc', 'name-desc'];
+
+function parsePrice(value: string | null): number | '' {
+  if (value === null || value.trim() === '') return '';
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : '';
+}
+
+function ShopContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // State diinisialisasi dari URL → mendukung deep-link, share, & persist saat refresh.
+  const [searchQuery, setSearchQuery] = useState<string>(() => searchParams.get('q') ?? '');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+    const raw = searchParams.get('category');
+    return raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : [];
+  });
+  const [minPrice, setMinPrice] = useState<number | ''>(() => parsePrice(searchParams.get('min')));
+  const [maxPrice, setMaxPrice] = useState<number | ''>(() => parsePrice(searchParams.get('max')));
+  const [sortBy, setSortBy] = useState<string>(() => {
+    const s = searchParams.get('sort');
+    return s && VALID_SORTS.includes(s) ? s : 'default';
+  });
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+  // Tulis state kembali ke URL (replace + debounce) agar URL selalu mencerminkan filter aktif.
+  // Memakai replace (bukan push) supaya tidak membanjiri riwayat browser tiap ketikan.
+  const isFirstRun = useRef(true);
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set('q', searchQuery.trim());
+    if (selectedCategories.length > 0) params.set('category', selectedCategories.join(','));
+    if (minPrice !== '') params.set('min', String(minPrice));
+    if (maxPrice !== '') params.set('max', String(maxPrice));
+    if (sortBy !== 'default') params.set('sort', sortBy);
+
+    const queryString = params.toString();
+    const target = queryString ? `/shop?${queryString}` : '/shop';
+
+    const timeout = setTimeout(() => {
+      router.replace(target, { scroll: false });
+    }, 250);
+    return () => clearTimeout(timeout);
+  }, [searchQuery, selectedCategories, minPrice, maxPrice, sortBy, router]);
 
   // Sumber produk dari store (Supabase bila terkonfigurasi, jika tidak fallback lokal).
   const products = useProductStore((s) => s.products);
@@ -385,5 +429,13 @@ export default function ShopPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopContent />
+    </Suspense>
   );
 }
