@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // ============================================================================
 // Security headers + Content-Security-Policy
@@ -13,6 +14,8 @@ import type { NextConfig } from "next";
 //   masih diperlukan agar aplikasi tidak rusak. Ini trade-off pragmatis;
 //   bisa diperketat nanti dengan CSP berbasis nonce + middleware.
 // - Supabase realtime memakai WebSocket (wss://*.supabase.co).
+// - Sentry: event di-tunnel lewat domain sendiri (lihat tunnelRoute di bawah),
+//   sehingga cukup connect-src 'self' tanpa whitelist domain ingest Sentry.
 // ============================================================================
 
 const csp = [
@@ -57,4 +60,32 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// ============================================================================
+// Sentry build wrapper
+// ============================================================================
+// - org/project/authToken hanya dipakai saat upload source map (CI/Vercel).
+//   Bila authToken kosong, upload dilewati dan build tetap berjalan normal.
+// - tunnelRoute: client mengirim event ke /monitoring (same-origin) lalu
+//   diteruskan server ke Sentry. Ini menghindari ad-blocker sekaligus lolos
+//   CSP connect-src 'self' tanpa perlu whitelist domain ingest Sentry.
+// ============================================================================
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Diam saat tidak di CI agar log build bersih.
+  silent: !process.env.CI,
+
+  // Perlebar cakupan upload source map sisi klien.
+  widenClientFileUpload: true,
+
+  // Tunnel event lewat domain sendiri (lihat catatan CSP di atas).
+  tunnelRoute: "/monitoring",
+
+  // Hapus logger Sentry dari bundle produksi.
+  disableLogger: true,
+
+  // Nonaktifkan telemetry build SDK.
+  telemetry: false,
+});

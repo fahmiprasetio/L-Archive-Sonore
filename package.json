@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^5.22.0",
+    "@sentry/nextjs": "^9.0.0",
     "@supabase/supabase-js": "^2.107.0",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.35.1",

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import * as Sentry from '@sentry/nextjs';
 import { AlertTriangle, RotateCcw, Home } from 'lucide-react';
 
 export default function Error({
@@ -12,8 +13,10 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Catat error ke console untuk debugging.
+    // Catat error ke console untuk debugging lokal.
     console.error('[App Error]', error);
+    // Kirim ke Sentry untuk monitoring produksi.
+    Sentry.captureException(error);
   }, [error]);
 
   return (
