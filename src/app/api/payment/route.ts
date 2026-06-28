@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 export async function POST(request: Request) {
   // Rate limit: 10 permintaan checkout per menit per IP.
   const ip = getClientIp(request);
-  const rl = rateLimit(`payment:${ip}`, 10, 60_000);
+  const rl = await rateLimit(`payment:${ip}`, 10, 60_000);
   if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
 
   try {

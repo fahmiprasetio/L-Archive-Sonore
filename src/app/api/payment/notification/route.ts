@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 export async function POST(request: Request) {
   // Rate limit longgar untuk webhook: 120 permintaan per menit per IP.
   const ip = getClientIp(request);
-  const rl = rateLimit(`midtrans-notif:${ip}`, 120, 60_000);
+  const rl = await rateLimit(`midtrans-notif:${ip}`, 120, 60_000);
   if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
 
   try {

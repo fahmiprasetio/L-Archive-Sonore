@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       { status: 503 }
     );
   }
-  const rl = limited(request);
+  const rl = await limited(request);
   if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -49,7 +49,7 @@ export async function PUT(request: Request) {
       { status: 503 }
     );
   }
-  const rl = limited(request);
+  const rl = await limited(request);
   if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
   const admin = await requireAdmin(request);
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
