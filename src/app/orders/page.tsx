@@ -7,7 +7,8 @@ import { useAuthStore } from '@/store/authStore';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { fetchMyOrders } from '@/lib/db/orders';
 import type { Order } from '@/lib/db/orders';
-import { ArrowLeft, ShoppingBag, Package } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Package, MapPin } from 'lucide-react';
+import OrderTracker from '@/components/order/OrderTracker';
 
 export default function OrdersPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -42,9 +43,22 @@ export default function OrdersPage() {
   const currency = (n: number) => '$' + n.toLocaleString('en-US');
 
   const statusColor = (status: string) => {
-    if (status === 'paid') return 'bg-green-100 text-green-700';
-    if (status === 'failed') return 'bg-red-100 text-red-700';
-    return 'bg-amber-100 text-amber-700';
+    switch (status) {
+      case 'paid':
+        return 'bg-green-100 text-green-700';
+      case 'processing':
+        return 'bg-blue-100 text-blue-700';
+      case 'shipped':
+        return 'bg-indigo-100 text-indigo-700';
+      case 'delivered':
+        return 'bg-emerald-100 text-emerald-700';
+      case 'cancelled':
+        return 'bg-neutral-200 text-neutral-600';
+      case 'failed':
+        return 'bg-red-100 text-red-700';
+      default:
+        return 'bg-amber-100 text-amber-700';
+    }
   };
 
   if (authLoading || (loading && user)) {
@@ -95,6 +109,19 @@ export default function OrdersPage() {
                   {o.status}
                 </span>
               </div>
+
+              {/* Visual order tracking */}
+              <div className="mt-4">
+                <OrderTracker status={o.status} />
+              </div>
+
+              {o.customer_address && (
+                <p className="mt-4 flex items-start gap-1.5 text-xs text-neutral-500">
+                  <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+                  <span>{o.customer_address}</span>
+                </p>
+              )}
+
               <div className="mt-3 space-y-1.5">
                 {o.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between text-sm">
