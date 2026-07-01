@@ -10,11 +10,9 @@ export const PRODUCTS: ProductWithSpecs[] = [
     name: 'Gibson Les Paul Standard',
     description: 'The legendary solid-body electric guitar with dual humbuckers and mahogany construction.',
     price: 2499,
-    image_url: 'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&q=80&w=600',
+    image_url: '/barang/Gibson%20Les%20Paul%20Standard.png',
     images: [
-      'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1564186763535-ebb21ec52744?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=600'
+      '/barang/Gibson%20Les%20Paul%20Standard.png'
     ],
     category: 'Guitar',
     specs: ['Mahogany Body', 'Rosewood Fretboard', 'Burstbucker Pickups', 'Nitrocellulose Finish']
@@ -24,10 +22,9 @@ export const PRODUCTS: ProductWithSpecs[] = [
     name: 'Yamaha U1 Upright Piano',
     description: 'A perennial favorite among discerning pianists, offering outstanding musical performance.',
     price: 8999,
-    image_url: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&q=80&w=600',
+    image_url: '/barang/Yamaha%20U1%20Upright%20Piano.png',
     images: [
-      'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&q=80&w=600',
-      'https://images.unsplash.com/photo-1552422535-c45813c61732?auto=format&fit=crop&q=80&w=600'
+      '/barang/Yamaha%20U1%20Upright%20Piano.png'
     ],
     category: 'Piano',
     specs: ['Spruce Soundboard', 'V-Pro Plate', 'Premium Felt Hammers', 'Soft-Close Fallboard']
@@ -77,7 +74,7 @@ export const PRODUCTS: ProductWithSpecs[] = [
     name: 'Fender Custom Shop Stratocaster',
     description: 'Hand-selected alder body and vintage-wound pickups for ultimate classic tone.',
     price: 3899,
-    image_url: 'https://images.unsplash.com/photo-1564186763535-ebb21ec52744?auto=format&fit=crop&q=80&w=600',
+    image_url: '/barang/Fender%20Custom%20Shop%20Stratocaster.png',
     category: 'Guitar',
     specs: ['Alder Body', 'Maple Neck', 'Custom Shop Pickups', 'Relic Finish']
   },
@@ -86,7 +83,7 @@ export const PRODUCTS: ProductWithSpecs[] = [
     name: 'Steinway & Sons Model B Grand',
     description: 'The standard of excellence in concert pianos, offering unparalleled tone and touch.',
     price: 112000,
-    image_url: 'https://images.unsplash.com/photo-1552422535-c45813c61732?auto=format&fit=crop&q=80&w=600',
+    image_url: '/barang/Steinway%20%26%20Sons%20Model%20B%20Grand.png',
     category: 'Piano',
     specs: ['Premium Sitka Spruce Soundboard', 'Hard Rock Maple Rim', 'Swedish Steel Treble Wire', 'Hand-crafted']
   },
@@ -104,7 +101,7 @@ export const PRODUCTS: ProductWithSpecs[] = [
     name: 'Taylor 814ce Acoustic Guitar',
     description: 'Taylor flag-ship grand auditorium acoustic-electric guitar with V-Class bracing.',
     price: 3999,
-    image_url: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=600',
+    image_url: '/barang/Taylor%20814ce%20Acoustic%20Guitar.png',
     category: 'Guitar',
     specs: ['Sitka Spruce Top', 'Indian Rosewood Back & Sides', 'Expression System 2 Electronics', 'V-Class Bracing']
   },
@@ -113,7 +110,7 @@ export const PRODUCTS: ProductWithSpecs[] = [
     name: 'Nord Stage 4 88 Keyboard',
     description: 'The ultimate stage keyboard with triple sensor keybed and physical drawbars.',
     price: 4899,
-    image_url: 'https://images.unsplash.com/photo-1552422535-c45813c61732?auto=format&fit=crop&q=80&w=600',
+    image_url: '/barang/Nord%20Stage%204%2088%20Keyboard.png',
     category: 'Piano',
     specs: ['88 Weighted Keys', 'Independent Section Controls', 'Award-winning Sound Library', 'Physical Drawbars']
   },
