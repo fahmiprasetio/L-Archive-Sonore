@@ -7,6 +7,7 @@ import { validateCouponServer } from '@/lib/db/coupons';
 import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
 import { readJsonLimited } from '@/lib/body-limit';
 import { calcShipping, calcTax } from '@/lib/pricing';
+import { verifyCaptcha } from '@/lib/captcha';
 
 export const runtime = 'nodejs';
 
@@ -23,6 +24,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
     }
     const body = bodyResult.value;
+
+    // Verifikasi CAPTCHA (Cloudflare Turnstile). Bila TURNSTILE_SECRET_KEY tidak
+    // diset, verifikasi otomatis DILEWATI (captcha opsional) — lihat lib/captcha.
+    const captcha = await verifyCaptcha(body.captchaToken, ip);
+    if (!captcha.ok) {
+      return NextResponse.json(
+        { error: captcha.error || 'Verifikasi keamanan gagal' },
+        { status: 400 }
+      );
+    }
 
     const itemsResult = validateCartItems(body.items);
     if (!itemsResult.ok) {

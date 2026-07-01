@@ -9,6 +9,8 @@ import { withSentryConfig } from "@sentry/nextjs";
 // Catatan penting soal CSP:
 // - Midtrans Snap memuat script & membuka iframe ke domain Midtrans, jadi
 //   domain tsb harus diizinkan di script-src/frame-src/connect-src.
+// - Cloudflare Turnstile (captcha, opsional) memuat script & iframe dari
+//   challenges.cloudflare.com, jadi domain tsb diizinkan juga.
 // - Next.js + React menyuntikkan sebagian style & script inline (hydration),
 //   sehingga 'unsafe-inline' (style) dan 'unsafe-inline'/'unsafe-eval' (script)
 //   masih diperlukan agar aplikasi tidak rusak. Ini trade-off pragmatis;
@@ -20,12 +22,12 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const csp = [
   `default-src 'self'`,
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com https://app.midtrans.com https://*.midtrans.com`,
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com https://app.midtrans.com https://*.midtrans.com https://challenges.cloudflare.com`,
   `style-src 'self' 'unsafe-inline'`,
   `img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://*.midtrans.com`,
   `font-src 'self' data:`,
-  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://app.sandbox.midtrans.com https://app.midtrans.com https://api.sandbox.midtrans.com https://api.midtrans.com`,
-  `frame-src 'self' https://app.sandbox.midtrans.com https://app.midtrans.com https://*.midtrans.com`,
+  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://app.sandbox.midtrans.com https://app.midtrans.com https://api.sandbox.midtrans.com https://api.midtrans.com https://challenges.cloudflare.com`,
+  `frame-src 'self' https://app.sandbox.midtrans.com https://app.midtrans.com https://*.midtrans.com https://challenges.cloudflare.com`,
   `object-src 'none'`,
   `base-uri 'self'`,
   `form-action 'self'`,
