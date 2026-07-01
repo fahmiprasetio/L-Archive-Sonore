@@ -117,15 +117,15 @@ export default function Home() {
         <div className="relative z-10 bg-[#441004] w-full text-white pb-[36rem] -mt-[12%]">
           {/* Brand Intro Callout Section */}
           <div className="max-w-4xl mx-auto px-6 pt-64 pb-24 text-center flex flex-col items-center justify-center space-y-8 select-none">
-            <h2 className="font-clash font-medium text-white text-3xl sm:text-4xl md:text-5xl uppercase tracking-widest leading-none">
+            <h2 className="font-clash font-medium text-white text-2xl sm:text-3xl md:text-4xl uppercase tracking-widest leading-none">
               L&apos;Archive Sonore
             </h2>
-            <p className="font-cormorant italic font-light text-white text-3xl sm:text-4xl md:text-5xl max-w-[28rem] sm:max-w-[36rem] md:max-w-[46rem] leading-tight select-text">
+            <p className="font-cormorant italic font-light text-white text-2xl sm:text-3xl md:text-4xl max-w-[24rem] sm:max-w-[32rem] md:max-w-[40rem] leading-tight select-text">
               where timeless instruments find their next definitive chapter.
             </p>
             <a
               href="#featured"
-              className="inline-block mt-4 px-8 py-3 border border-white/20 hover:border-white rounded-full text-[9px] tracking-widest uppercase text-white/90 hover:text-white transition duration-300 font-sans"
+              className="inline-block mt-6 px-12 py-4 border border-white/20 hover:border-white rounded-md text-xs tracking-widest uppercase text-white/90 hover:text-white transition duration-300 font-sans"
             >
               Explore Instruments
             </a>
@@ -142,10 +142,10 @@ export default function Home() {
             </div>
 
             {/* Carousel — scroll ke samping, hanya 5 barang */}
-            <div className="-mx-6 px-6 overflow-x-auto pb-4 [scrollbar-width:thin]">
-              <div className="flex gap-6 snap-x snap-mandatory">
+            <div className="featured-scroll -mx-6 px-6 overflow-x-auto pb-6">
+              <div className="flex gap-4 snap-x snap-mandatory">
                 {MOCK_PRODUCTS.slice(0, 5).map((product) => (
-                  <div key={product.id} className="snap-start shrink-0 w-72">
+                  <div key={product.id} className="snap-start shrink-0 w-80">
                     <ProductCard product={product} dark />
                   </div>
                 ))}

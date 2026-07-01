@@ -65,3 +65,29 @@ h1, h2, h3, h4, h5, h6, .font-clash {
   transform: scaleX(1);
 }
 
+/* Custom scrollbar for the Featured Instruments carousel */
+.featured-scroll {
+  scrollbar-width: auto;
+  scrollbar-color: rgba(240, 240, 240, 0.85) rgba(240, 240, 240, 0.12);
+}
+
+.featured-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.featured-scroll::-webkit-scrollbar-track {
+  background: rgba(240, 240, 240, 0.12);
+  border-radius: 9999px;
+}
+
+.featured-scroll::-webkit-scrollbar-thumb {
+  background: rgba(240, 240, 240, 0.85);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.featured-scroll::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+  background-clip: padding-box;
+}
