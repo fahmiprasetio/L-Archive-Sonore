@@ -127,14 +127,18 @@ export default function Navbar() {
               <Link
                 key={item.name}
                 href={item.path}
-                className={`group flex items-center justify-between py-2.5 border-b ${dividerColorSoft} transition-all duration-300 ${isActive ? menuActive : menuInactive
+                className={`group flex items-center gap-4 py-2.5 border-b ${dividerColorSoft} transition-all duration-300 ${isActive ? menuActive : menuInactive
                   }`}
               >
-                <span className="font-clash text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300">
+                <span className="font-clash text-xs uppercase tracking-[0.2em] font-semibold whitespace-nowrap shrink-0 transition-all duration-300">
                   {item.name}
                 </span>
+                {/* Garis hover: flex-1 mengisi ruang sisa setelah teks, jadi panjangnya
+                    otomatis berbeda per menu (menu pendek -> garis lebih panjang).
+                    scale-x dari origin-left membuatnya tumbuh dari dekat teks ke kanan,
+                    dan teks TIDAK pernah terdorong turun (shrink-0 + whitespace-nowrap). */}
                 <span
-                  className={`h-0.5 transition-all duration-300 ease-out w-0 group-hover:w-50 ${lineColor}`}
+                  className={`h-0.5 flex-1 min-w-0 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out ${lineColor}`}
                 ></span>
               </Link>
             );

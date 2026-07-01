@@ -80,7 +80,7 @@ export default function Footer() {
   return (
     <footer
       ref={footerOuterRef}
-      className={`w-full bg-black text-sage-secondary select-none font-sans relative overflow-visible z-50 ${
+      className={`w-full bg-black text-[#EFE6D3] select-none font-sans relative overflow-visible z-50 ${
         isHome ? '-mt-24' : isShop ? 'mt-0' : 'mt-16'
       }`}
     >
@@ -112,39 +112,39 @@ export default function Footer() {
             {/* Top Section: Info Grid */}
             <div className="mx-auto max-w-[96%] px-4 grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
               <div className="md:col-span-2 space-y-4">
-                <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-sage-primary leading-snug uppercase">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-[#EFE6D3] leading-snug uppercase">
                   An e-commerce platform dedicated to premium musical gear, refined aesthetics, and classic sound archiving.
                 </h3>
               </div>
 
               <div className="space-y-2 text-xs">
-                <h4 className="font-bold text-sage-primary uppercase tracking-wider">Address</h4>
-                <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+                <h4 className="font-bold text-[#EFE6D3] uppercase tracking-wider">Address</h4>
+                <p className="text-[#EFE6D3]/70 leading-relaxed font-light uppercase">
                   Sound Avenue 42,<br />
                   Jakarta, Indonesia
                 </p>
               </div>
 
               <div className="space-y-2 text-xs">
-                <h4 className="font-bold text-sage-primary uppercase tracking-wider">New Projects</h4>
-                <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+                <h4 className="font-bold text-[#EFE6D3] uppercase tracking-wider">New Projects</h4>
+                <p className="text-[#EFE6D3]/70 leading-relaxed font-light uppercase">
                   hello@larchivesonore.com
                 </p>
               </div>
 
               <div className="space-y-2 text-xs">
-                <h4 className="font-bold text-sage-primary uppercase tracking-wider">Call Us</h4>
-                <p className="text-sage-secondary/80 leading-relaxed font-light uppercase">
+                <h4 className="font-bold text-[#EFE6D3] uppercase tracking-wider">Call Us</h4>
+                <p className="text-[#EFE6D3]/70 leading-relaxed font-light uppercase">
                   +62 812 3456 789
                 </p>
               </div>
             </div>
 
             {/* Dotted Divider */}
-            <div className="mx-auto max-w-[96%] px-4 border-t border-dotted border-sage-primary/30 my-6"></div>
+            <div className="mx-auto max-w-[96%] px-4 border-t border-dotted border-[#EFE6D3]/25 my-6"></div>
 
             {/* Metadata links row */}
-            <div className="mx-auto max-w-[96%] px-4 flex flex-wrap justify-between items-center text-[10px] tracking-widest text-sage-primary/80 uppercase mb-8 gap-4 font-light">
+            <div className="mx-auto max-w-[96%] px-4 flex flex-wrap justify-between items-center text-[10px] tracking-widest text-[#EFE6D3]/70 uppercase mb-8 gap-4 font-light">
               <span>L&apos;Archive Sonore</span>
               <span>&copy; 2026</span>
               <div className="flex gap-8">
