@@ -13,14 +13,14 @@
   "dependencies": {
     "@notionhq/client": "^5.22.0",
     "@sentry/nextjs": "^9.0.0",
-    "@supabase/supabase-js": "^2.107.0",
+    "@supabase/supabase-js": "^2.110.0",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.35.1",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^1.22.0",
     "midtrans-client": "^1.4.3",
-    "next": "16.2.7",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "next": "16.2.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
@@ -29,7 +29,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.7",
+    "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.0.0"
