@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { snap } from '@/lib/midtrans';
+import { createSnapTransaction, resolveNotificationUrl } from '@/lib/midtrans';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getUserFromRequest } from '@/lib/server-auth';
 import { validateCartItems, validateCustomerDetails, validateCouponCode } from '@/lib/validation';
@@ -189,8 +189,11 @@ export async function POST(request: Request) {
       item_details: itemDetails,
     };
 
-    // Call Midtrans Snap API to get transaction token and redirect url
-    const transaction = await snap.createTransaction(parameter);
+    // Buat transaksi Snap dengan Notification URL milik PROJECT INI (override
+    // per transaksi). Dengan begitu satu akun Midtrans bisa dipakai banyak
+    // website tanpa saling menimpa setelan webhook di dashboard.
+    const notificationUrl = resolveNotificationUrl(request);
+    const transaction = await createSnapTransaction(parameter, { notificationUrl });
 
     // Catat order (status pending) memakai service-role. user_id diisi bila login.
     // Snapshot order memakai harga database (otoritatif), bukan harga klien.
