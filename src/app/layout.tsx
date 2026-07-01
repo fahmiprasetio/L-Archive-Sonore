@@ -70,6 +70,7 @@ import Footer from "@/components/layout/Footer";
 import AuthInitializer from "@/components/layout/AuthInitializer";
 import MainWrapper from "@/components/layout/MainWrapper";
 import Toaster from "@/components/ui/Toaster";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 export default function RootLayout({
   children,
@@ -89,6 +90,7 @@ export default function RootLayout({
         </MainWrapper>
         <Footer />
         <Toaster />
+        <ChatWidget />
       </body>
     </html>
   );
