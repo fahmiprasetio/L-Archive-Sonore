@@ -11,22 +11,24 @@ const HERO_ASSETS = [
   '/logo_title.png',
 ];
 
-const MIN_DURATION = 1200; // durasi minimum splash tampil (ms) agar tidak berkedip
+const MIN_DURATION = 1400; // durasi minimum splash tampil (ms) agar animasi sempat terlihat
 const SAFETY_TIMEOUT = 6000; // jaring pengaman: jangan pernah menahan user terlalu lama
 
 /**
  * Splash / loading screen.
  *
- * Menutupi seluruh layar saat pertama kali situs dibuka, menampilkan progress
- * sambil melakukan preload gambar hero. Preload ini menghangatkan cache browser
- * sehingga ketika hero section dirender, gambarnya langsung muncul dan situs
- * tidak lagi terlihat setengah jadi (hanya teks tanpa visual).
+ * Menutupi seluruh layar saat pertama kali situs dibuka. Progress bar-nya
+ * TIDAK lagi diikat langsung ke event asli (yang dulu membuatnya nyangkut di
+ * 8% lalu tiba-tiba lompat ke 100%). Sekarang progress dianimasikan mulus
+ * lewat requestAnimationFrame: merangkak naik menuju ~90% dengan easing, lalu
+ * begitu aset hero + window benar-benar siap ia meluncur mulus ke 100% baru
+ * fade-out. Preload gambar hero tetap dilakukan untuk menghangatkan cache.
  */
 export default function SplashScreen() {
-  const [progress, setProgress] = useState(8);
+  const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<'loading' | 'fading' | 'done'>('loading');
   const startRef = useRef(Date.now());
-  const finishedRef = useRef(false);
+  const readyRef = useRef(false); // true saat semua aset + window siap
 
   useEffect(() => {
     // Hanya tampil sekali per sesi browser agar tidak mengganggu saat
@@ -40,43 +42,18 @@ export default function SplashScreen() {
     let loaded = 0;
     let windowReady = document.readyState === 'complete';
 
-    const maybeFinish = () => {
-      if (finishedRef.current) return;
-      if (loaded < HERO_ASSETS.length || !windowReady) return;
-
-      finishedRef.current = true;
-      const elapsed = Date.now() - startRef.current;
-      const wait = Math.max(0, MIN_DURATION - elapsed);
-
-      window.setTimeout(() => {
-        if (cancelled) return;
-        setProgress(100);
-        window.setTimeout(() => {
-          if (cancelled) return;
-          sessionStorage.setItem('las-splash-seen', '1');
-          setPhase('fading');
-          // Selaras dengan durasi transisi fade (duration-500).
-          window.setTimeout(() => {
-            if (!cancelled) setPhase('done');
-          }, 550);
-        }, 220);
-      }, wait);
+    const checkReady = () => {
+      if (loaded >= HERO_ASSETS.length && windowReady) {
+        readyRef.current = true;
+      }
     };
 
-    const update = () => {
-      const imgRatio = loaded / HERO_ASSETS.length;
-      // Bobot progress: 70% dari gambar hero, 30% dari kesiapan window.
-      const pct = Math.min(99, Math.round(imgRatio * 70 + (windowReady ? 30 : 0)));
-      if (!cancelled) setProgress((prev) => Math.max(prev, pct));
-      maybeFinish();
-    };
-
-    // Preload seluruh gambar hero.
+    // Preload seluruh gambar hero (menghangatkan cache browser).
     HERO_ASSETS.forEach((src) => {
       const img = new window.Image();
       const done = () => {
         loaded += 1;
-        update();
+        checkReady();
       };
       img.onload = done;
       img.onerror = done; // aset hilang pun jangan sampai menyangkut
@@ -85,21 +62,61 @@ export default function SplashScreen() {
 
     const onWindowLoad = () => {
       windowReady = true;
-      update();
+      checkReady();
     };
     if (!windowReady) window.addEventListener('load', onWindowLoad);
 
-    // Jaring pengaman: apa pun kondisinya, splash pasti hilang.
+    // Jaring pengaman: apa pun kondisinya, splash pasti dilepas.
     const safety = window.setTimeout(() => {
-      windowReady = true;
       loaded = HERO_ASSETS.length;
-      update();
+      windowReady = true;
+      readyRef.current = true;
     }, SAFETY_TIMEOUT);
 
-    update();
+    checkReady();
+
+    // ------------------------------------------------------------------
+    // Loop animasi progress (mulus, tidak pernah "diam lalu meloncat").
+    // ------------------------------------------------------------------
+    let raf = 0;
+    let current = 0;
+
+    const tick = () => {
+      if (cancelled) return;
+
+      const elapsed = Date.now() - startRef.current;
+      const minPassed = elapsed >= MIN_DURATION;
+
+      if (readyRef.current && minPassed) {
+        // Fase akhir: meluncur mulus ke 100%.
+        current += (100 - current) * 0.14 + 0.4;
+        if (current >= 99.5) {
+          setProgress(100);
+          sessionStorage.setItem('las-splash-seen', '1');
+          window.setTimeout(() => {
+            if (!cancelled) setPhase('fading');
+            window.setTimeout(() => {
+              if (!cancelled) setPhase('done');
+            }, 720);
+          }, 260);
+          return; // hentikan loop
+        }
+      } else {
+        // Fase memuat: merangkak menuju 90% dengan easing (melambat di ujung).
+        const cap = 90;
+        current += (cap - current) * 0.018 + 0.25;
+        if (current > cap) current = cap;
+      }
+
+      setProgress(Math.min(100, Math.round(current)));
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
 
     return () => {
       cancelled = true;
+      cancelAnimationFrame(raf);
       window.removeEventListener('load', onWindowLoad);
       window.clearTimeout(safety);
     };
@@ -114,12 +131,12 @@ export default function SplashScreen() {
       aria-hidden={isFading}
       role="status"
       aria-label="Loading L'Archive Sonore"
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#441004] transition-opacity duration-500 ease-in-out ${
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#441004] transition-opacity duration-700 ease-in-out ${
         isFading ? 'pointer-events-none opacity-0' : 'opacity-100'
       }`}
     >
-      {/* Wordmark */}
-      <div className="flex select-none flex-col items-center">
+      {/* Wordmark dengan animasi masuk fade-up */}
+      <div className="splash-fade-up flex select-none flex-col items-center">
         <span className="font-cormorant text-3xl font-light italic leading-none text-white/90 sm:text-4xl">
           L&apos;Archive
         </span>
@@ -128,15 +145,28 @@ export default function SplashScreen() {
         </span>
       </div>
 
+      {/* Equalizer bertema audio (animasi terus-menerus) */}
+      <div className="mt-9 flex h-8 items-end gap-1.5" aria-hidden="true">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <span
+            key={i}
+            className="splash-eq h-full w-1 rounded-full bg-white/70"
+            style={{ animationDelay: `${i * 0.14}s`, animationDuration: `${1 + (i % 3) * 0.18}s` }}
+          />
+        ))}
+      </div>
+
       {/* Progress */}
-      <div className="mt-10 flex w-56 flex-col items-center gap-3 sm:w-64">
-        <div className="h-[2px] w-full overflow-hidden rounded-full bg-white/15">
+      <div className="mt-9 flex w-56 flex-col items-center gap-3 sm:w-64">
+        <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/15">
           <div
-            className="h-full rounded-full bg-white transition-[width] duration-300 ease-out"
+            className="h-full rounded-full bg-white"
             style={{ width: `${progress}%` }}
           />
+          {/* Shimmer melintas di atas track */}
+          <div className="splash-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/80 to-transparent" />
         </div>
-        <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-white/50">
+        <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-white/50 tabular-nums">
           {progress}%
         </span>
       </div>

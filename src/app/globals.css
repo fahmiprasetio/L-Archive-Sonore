@@ -91,3 +91,62 @@ h1, h2, h3, h4, h5, h6, .font-clash {
   background: #ffffff;
   background-clip: padding-box;
 }
+
+/* ==========================================================================
+   Splash screen animations
+   ========================================================================== */
+
+/* Wordmark masuk dengan fade + naik halus */
+@keyframes splash-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.splash-fade-up {
+  animation: splash-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Bar equalizer naik-turun terus-menerus (nuansa audio) */
+@keyframes splash-eq {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.splash-eq {
+  transform-origin: bottom center;
+  animation: splash-eq 1.1s ease-in-out infinite;
+}
+
+/* Kilau (shimmer) yang melintas di atas progress bar */
+@keyframes splash-shimmer {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(450%);
+  }
+}
+
+.splash-shimmer {
+  animation: splash-shimmer 1.6s ease-in-out infinite;
+}
+
+/* Hormati preferensi pengguna yang mengurangi animasi */
+@media (prefers-reduced-motion: reduce) {
+  .splash-fade-up,
+  .splash-eq,
+  .splash-shimmer {
+    animation: none;
+  }
+}
