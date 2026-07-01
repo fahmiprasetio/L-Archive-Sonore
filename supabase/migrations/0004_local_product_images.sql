@@ -1,7 +1,10 @@
 -- L'Archive Sonore — Ganti gambar produk ke file lokal (/public/barang)
 -- Jalankan di Supabase Dashboard > SQL Editor.
--- Hanya 6 produk yang punya file gambar di /public/barang; sisanya dibiarkan.
--- Cocokkan berdasarkan NAMA agar tetap benar meski id baris berbeda.
+-- Aman dijalankan ulang (idempoten). Hanya 6 produk yang punya file gambar
+-- di /public/barang; sisanya dibiarkan. Dicocokkan berdasarkan NAMA.
+
+-- Pastikan kolom galeri ada (DB lama mungkin belum punya kolom ini).
+alter table public.products add column if not exists images text[] not null default '{}';
 
 update public.products
   set image_url = '/barang/Gibson%20Les%20Paul%20Standard.png',
