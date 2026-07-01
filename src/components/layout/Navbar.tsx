@@ -82,7 +82,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed z-50 transition-all duration-500 ease-in-out ${headerState}`}
+      className={`fixed z-[60] transition-all duration-500 ease-in-out ${headerState}`}
     >
       <div className="flex items-center justify-between w-full">
         {/* Title */}
