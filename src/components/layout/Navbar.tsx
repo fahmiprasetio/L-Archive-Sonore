@@ -46,9 +46,16 @@ export default function Navbar() {
   const dividerColor = onDarkBg ? 'border-white/10' : 'border-black/10';
   const dividerColorSoft = onDarkBg ? 'border-white/5' : 'border-black/10';
   const menuActive = onDarkBg ? 'text-white' : 'text-neutral-900';
+  // Di latar gelap (mode top pada hero + pill scrolled) teks menu dibuat PUTIH,
+  // bukan abu-abu, agar terbaca sempurna. Umpan balik hover tetap ada lewat
+  // garis underline yang memanjang (group-hover) di tiap item.
   const menuInactive = onDarkBg
-    ? 'text-neutral-400 hover:text-white'
+    ? 'text-white/90 hover:text-white'
     : 'text-neutral-500 hover:text-neutral-900';
+
+  // Lingkaran hover di sekitar hamburger: semi-transparan (bukan opacity penuh)
+  // supaya user tahu tombolnya bisa ditekan tanpa terlihat mencolok.
+  const hamburgerHoverCircle = onDarkBg ? 'bg-white/15' : 'bg-neutral-900/10';
 
   // ==========================================================================
   // Anti-"hantakan" pada judul saat top -> scrolled.
@@ -92,14 +99,19 @@ export default function Navbar() {
         {/* Hamburger Menu Trigger */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative flex flex-col justify-center items-end gap-1.5 w-8 h-8 cursor-pointer focus:outline-none"
+          className="group relative flex flex-col justify-center items-end gap-1.5 w-8 h-8 cursor-pointer focus:outline-none"
           aria-label="Toggle Menu"
         >
+          {/* Lingkaran hover (semi-transparan), di belakang garis hamburger */}
           <span
-            className={`h-0.5 transition-all duration-300 ease-out ${lineColor} ${isOpen ? 'w-5 rotate-45 translate-y-[4px]' : 'w-5'}`}
+            aria-hidden="true"
+            className={`pointer-events-none absolute top-1/2 -right-2 h-9 w-9 -translate-y-1/2 rounded-full opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 ${hamburgerHoverCircle}`}
           ></span>
           <span
-            className={`h-0.5 transition-all duration-300 ease-out ${lineColor} ${isOpen ? 'w-5 -rotate-45 -translate-y-[4px]' : 'w-3'}`}
+            className={`relative h-0.5 transition-all duration-300 ease-out ${lineColor} ${isOpen ? 'w-5 rotate-45 translate-y-[4px]' : 'w-5'}`}
+          ></span>
+          <span
+            className={`relative h-0.5 transition-all duration-300 ease-out ${lineColor} ${isOpen ? 'w-5 -rotate-45 -translate-y-[4px]' : 'w-3'}`}
           ></span>
         </button>
       </div>
