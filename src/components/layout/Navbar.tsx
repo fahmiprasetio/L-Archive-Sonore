@@ -50,25 +50,38 @@ export default function Navbar() {
     ? 'text-neutral-400 hover:text-white'
     : 'text-neutral-500 hover:text-neutral-900';
 
+  // ==========================================================================
+  // Anti-"hantakan" pada judul saat top -> scrolled.
+  //
+  // Posisi horizontal judul = header.left + border-left + padding-left.
+  // Sebelumnya judul "teleport" karena:
+  //   - inner div beralih dari `mx-auto max-w-[95%] px-6` menjadi tanpa padding
+  //     (margin auto & max-width persen TIDAK bisa dianimasikan dengan mulus), dan
+  //   - header.left berubah 0 -> 24px tanpa dikompensasi.
+  //
+  // Solusi: buat posisi-x judul KONSTAN di semua state, hanya width/top/bg/
+  // padding-vertikal yang beranimasi.
+  //   - top    : left-0 (0px)  + px-11 (44px) = 44px
+  //   - scrolled: left-6 (24px) + px-5  (20px) = 44px
+  // Karena keduanya sama (44px), judul "meluncur" mulus, bukan meloncat.
+  // ==========================================================================
+  const headerState = isScrolled
+    ? 'top-4 left-6 w-[20rem] max-w-[calc(100vw-3rem)] rounded-lg bg-black/40 backdrop-blur-sm border border-white/10 py-2.5 px-5 shadow-xl'
+    : isOpen
+      ? darkHero
+        ? 'top-0 left-0 w-full bg-black/5 backdrop-blur-md border border-transparent border-b-white/10 py-5 px-11'
+        : 'top-0 left-0 w-full bg-white/85 backdrop-blur-md border border-transparent border-b-black/10 py-5 px-11'
+      : 'top-0 left-0 w-full bg-transparent border border-transparent py-5 px-11';
+
   return (
     <header
-      className={`fixed z-50 transition-all duration-500 ease-in-out ${isScrolled
-        ? 'top-4 left-6 w-[20rem] max-w-[calc(100vw-3rem)] rounded-lg bg-black/40 backdrop-blur-sm border border-white/10 py-2.5 px-5 shadow-xl'
-        : isOpen
-          ? darkHero
-            ? 'top-0 left-0 w-full bg-black/5 backdrop-blur-md border-b border-white/10 py-5 px-6'
-            : 'top-0 left-0 w-full bg-white/85 backdrop-blur-md border-b border-black/10 py-5 px-6'
-          : 'top-0 left-0 w-full bg-transparent border-transparent py-5'
-        }`}
+      className={`fixed z-50 transition-all duration-500 ease-in-out ${headerState}`}
     >
-      <div
-        className={`flex items-center justify-between w-full transition-all duration-500 ${isScrolled ? '' : 'mx-auto max-w-[95%] px-6'
-          }`}
-      >
+      <div className="flex items-center justify-between w-full">
         {/* Title */}
         <Link
           href="/"
-          className={`font-bold tracking-widest font-clash uppercase transition-all duration-300 whitespace-nowrap hover:opacity-80 ${isScrolled
+          className={`font-bold tracking-widest font-clash uppercase transition-all duration-500 ease-in-out whitespace-nowrap hover:opacity-80 ${isScrolled
             ? 'text-sm sm:text-base'
             : 'text-lg sm:text-xl'
             } ${textColor}`}

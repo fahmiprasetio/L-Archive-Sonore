@@ -69,6 +69,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AuthInitializer from "@/components/layout/AuthInitializer";
 import MainWrapper from "@/components/layout/MainWrapper";
+import SplashScreen from "@/components/layout/SplashScreen";
 import Toaster from "@/components/ui/Toaster";
 import ChatWidget from "@/components/chat/ChatWidget";
 
@@ -83,6 +84,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900">
+        <SplashScreen />
         <AuthInitializer />
         <Navbar />
         <MainWrapper>
