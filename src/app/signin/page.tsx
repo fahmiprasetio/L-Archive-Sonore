@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
+import Turnstile, { isCaptchaConfigured } from '@/components/ui/Turnstile';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -13,6 +14,8 @@ export default function SignInPage() {
     email: '',
     password: '',
   });
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -21,17 +24,26 @@ export default function SignInPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLocalError(null);
     const { email, password } = formData;
 
     if (!email || !password) return;
 
+    // Captcha bersifat opsional (env-driven). Bila diaktifkan, wajib diselesaikan.
+    if (isCaptchaConfigured() && !captchaToken) {
+      setLocalError('Selesaikan verifikasi keamanan terlebih dahulu.');
+      return;
+    }
+
     try {
       await signIn(email, password);
       router.push('/profile');
-    } catch (err: any) {
-      // Error handled by store
+    } catch {
+      // Error sudah ditangani di store.
     }
   };
+
+  const displayError = localError || error;
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -44,9 +56,9 @@ export default function SignInPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
+          {displayError && (
             <div className="rounded bg-red-50 p-3 text-sm text-red-700 border border-red-100">
-              {error}
+              {displayError}
             </div>
           )}
 
@@ -78,11 +90,13 @@ export default function SignInPage() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
                 className="w-full rounded border border-gray-300 px-3 py-2 text-neutral-900 focus:border-neutral-900 focus:outline-none"
               />
             </div>
           </div>
+
+          {isCaptchaConfigured() && <Turnstile onToken={setCaptchaToken} />}
 
           <button
             type="submit"

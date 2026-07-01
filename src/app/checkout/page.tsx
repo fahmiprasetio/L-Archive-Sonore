@@ -1,18 +1,35 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
+import { useAuthStore } from '@/store/authStore';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { toast } from '@/store/toastStore';
 import { calcSummaryWithDiscount, FREE_SHIPPING_THRESHOLD } from '@/lib/pricing';
-import { ArrowLeft, CreditCard, Tag, X } from 'lucide-react';
+import { ArrowLeft, CreditCard, Tag, X, UserRound } from 'lucide-react';
 import Script from 'next/script';
+import Turnstile, { isCaptchaConfigured } from '@/components/ui/Turnstile';
+
+// Hasil callback Snap (kita hanya butuh order_id; field lain dibiarkan bebas).
+interface SnapResult {
+  order_id?: string;
+  [key: string]: unknown;
+}
+
+interface SnapCallbacks {
+  onSuccess?: (result: SnapResult) => void;
+  onPending?: (result: SnapResult) => void;
+  onError?: (result: SnapResult) => void;
+  onClose?: () => void;
+}
 
 declare global {
   interface Window {
-    snap: any;
+    snap?: {
+      pay: (token: string, callbacks?: SnapCallbacks) => void;
+    };
   }
 }
 
@@ -25,6 +42,7 @@ const SNAP_SRC =
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
+  const { user } = useAuthStore();
   const totalPrice = getTotalPrice();
 
   const [formData, setFormData] = useState({
@@ -34,6 +52,18 @@ export default function CheckoutPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
+
+  // Prefill nama & email dari akun yang login (guest tetap bisa isi manual).
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: prev.name || user.name || '',
+        email: prev.email || user.email || '',
+      }));
+    }
+  }, [user]);
 
   // Kupon
   const [couponInput, setCouponInput] = useState('');
@@ -90,6 +120,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (isCaptchaConfigured() && !captchaToken) {
+      toast.error('Selesaikan verifikasi keamanan terlebih dahulu');
+      return;
+    }
+
     setLoading(true);
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -110,6 +145,7 @@ export default function CheckoutPage() {
           items,
           customerDetails: formData,
           couponCode: appliedCoupon?.code,
+          captchaToken,
         }),
       });
 
@@ -119,31 +155,35 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Failed to initiate payment');
       }
 
-      if (data.token) {
-        window.snap.pay(data.token, {
-          onSuccess: function (result: any) {
-            clearCart();
-            toast.success('Payment successful! Redirecting to your order...');
-            const orderId = result?.order_id || data.order_id || '';
-            router.push(`/checkout/success?order_id=${encodeURIComponent(orderId)}`);
-          },
-          onPending: function () {
-            toast.info('Waiting for your payment to be completed.');
-          },
-          onError: function (result: any) {
-            console.error('Payment failed:', result);
-            toast.error('Payment failed. Please try again.');
-          },
-          onClose: function () {
-            toast.info('Payment window closed before completion.');
-          },
-        });
-      } else {
+      if (!data.token) {
         throw new Error('No snap token received');
       }
-    } catch (error: any) {
+      if (!window.snap) {
+        throw new Error('Modul pembayaran belum siap. Coba lagi sesaat.');
+      }
+
+      window.snap.pay(data.token, {
+        onSuccess: function (result: SnapResult) {
+          clearCart();
+          toast.success('Payment successful! Redirecting to your order...');
+          const orderId = result?.order_id || data.order_id || '';
+          router.push(`/checkout/success?order_id=${encodeURIComponent(orderId)}`);
+        },
+        onPending: function () {
+          toast.info('Waiting for your payment to be completed.');
+        },
+        onError: function (result: SnapResult) {
+          console.error('Payment failed:', result);
+          toast.error('Payment failed. Please try again.');
+        },
+        onClose: function () {
+          toast.info('Payment window closed before completion.');
+        },
+      });
+    } catch (error) {
       console.error('Payment error:', error);
-      toast.error(error.message || 'Payment error occurred');
+      const message = error instanceof Error ? error.message : 'Payment error occurred';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -175,6 +215,18 @@ export default function CheckoutPage() {
           <h2 className="text-xl font-bold text-neutral-900 mb-6 border-b border-gray-100 pb-3">
             Shipping Information
           </h2>
+
+          {!user && (
+            <div className="mb-6 flex items-start gap-2.5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+              <UserRound className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <p>
+                Anda checkout sebagai <strong>tamu</strong>. Simpan <strong>Order ID</strong> setelah membayar untuk melacak pesanan lewat{' '}
+                <Link href="/orders/track" className="font-semibold underline hover:text-blue-900">Lacak Pesanan</Link>. Sudah punya akun?{' '}
+                <Link href="/signin" className="font-semibold underline hover:text-blue-900">Masuk</Link> agar pesanan tersimpan otomatis.
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handlePayment} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-1">
@@ -223,6 +275,12 @@ export default function CheckoutPage() {
                 placeholder="123 Music Street, Sound City"
               />
             </div>
+
+            {isCaptchaConfigured() && (
+              <div className="pt-2">
+                <Turnstile onToken={setCaptchaToken} />
+              </div>
+            )}
 
             <button
               type="submit"

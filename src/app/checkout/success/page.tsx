@@ -49,6 +49,19 @@ function SuccessContent() {
         </Link>
       </div>
 
+      {orderId && (
+        <p className="mt-6 text-sm text-neutral-600">
+          Checkout sebagai tamu?{' '}
+          <Link
+            href={`/orders/track?order_id=${encodeURIComponent(orderId)}`}
+            className="font-semibold text-neutral-900 underline hover:text-neutral-700"
+          >
+            Lacak pesanan Anda
+          </Link>{' '}
+          kapan saja memakai Order ID di atas.
+        </p>
+      )}
+
       <p className="mt-10 inline-flex items-center gap-2 text-xs text-neutral-400">
         <Mail className="h-3.5 w-3.5" />
         Need help? hello@larchivesonore.com

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
+import Turnstile, { isCaptchaConfigured } from '@/components/ui/Turnstile';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function SignUpPage() {
   });
 
   const [localError, setLocalError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,11 +41,17 @@ export default function SignUpPage() {
       return;
     }
 
+    // Captcha bersifat opsional (env-driven). Bila diaktifkan, wajib diselesaikan.
+    if (isCaptchaConfigured() && !captchaToken) {
+      setLocalError('Selesaikan verifikasi keamanan terlebih dahulu.');
+      return;
+    }
+
     try {
       await signUp(email, password, name);
       router.push('/profile');
-    } catch (err: any) {
-      // Error handled by store/catch block
+    } catch {
+      // Error sudah ditangani di store (authError).
     }
   };
 
@@ -110,7 +118,7 @@ export default function SignUpPage() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
                 className="w-full rounded border border-gray-300 px-3 py-2 text-neutral-900 focus:border-neutral-900 focus:outline-none"
               />
             </div>
@@ -126,11 +134,13 @@ export default function SignUpPage() {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="••••••••"
+                placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
                 className="w-full rounded border border-gray-300 px-3 py-2 text-neutral-900 focus:border-neutral-900 focus:outline-none"
               />
             </div>
           </div>
+
+          {isCaptchaConfigured() && <Turnstile onToken={setCaptchaToken} />}
 
           <button
             type="submit"
