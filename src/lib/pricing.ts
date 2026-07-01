@@ -35,3 +35,31 @@ export function calcOrderSummary(subtotal: number): OrderSummary {
     total: safeSubtotal + shipping + tax,
   };
 }
+
+export interface OrderSummaryWithDiscount extends OrderSummary {
+  discount: number;
+}
+
+/**
+ * Ringkasan biaya dengan potongan kupon.
+ * Diskon di-clamp agar tidak melebihi subtotal; ongkir & pajak dihitung dari
+ * subtotal SETELAH diskon agar konsisten dengan perhitungan gross_amount di
+ * server (src/app/api/payment/route.ts).
+ */
+export function calcSummaryWithDiscount(
+  subtotal: number,
+  discount = 0
+): OrderSummaryWithDiscount {
+  const safeSubtotal = Math.max(0, subtotal);
+  const safeDiscount = Math.min(Math.max(0, Math.round(discount)), safeSubtotal);
+  const discountedSubtotal = safeSubtotal - safeDiscount;
+  const shipping = calcShipping(discountedSubtotal);
+  const tax = calcTax(discountedSubtotal);
+  return {
+    subtotal: safeSubtotal,
+    discount: safeDiscount,
+    shipping,
+    tax,
+    total: discountedSubtotal + shipping + tax,
+  };
+}

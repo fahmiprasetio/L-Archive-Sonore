@@ -71,7 +71,7 @@ export async function POST(request: Request) {
         .update({ status: 'paid' })
         .eq('id', order_id)
         .neq('status', 'paid')
-        .select('id, items');
+        .select('id, items, coupon_code');
 
       const justPaid = updated && updated.length > 0 ? updated[0] : null;
       if (justPaid && Array.isArray(justPaid.items) && justPaid.items.length > 0) {
@@ -86,6 +86,14 @@ export async function POST(request: Request) {
           // Order sudah 'paid'; jangan gagalkan webhook. Catat untuk ditindaklanjuti.
           console.error('Gagal mengurangi stok (atomic RPC):', stockErr);
         }
+      }
+
+      // Increment redemption kupon (hanya pada transisi pertama ke 'paid').
+      if (justPaid && justPaid.coupon_code) {
+        const { error: cErr } = await supabaseAdmin.rpc('increment_coupon_redemption', {
+          p_code: justPaid.coupon_code,
+        });
+        if (cErr) console.error('Gagal increment redemption kupon:', cErr);
       }
     } else {
       // Status lain (pending/failed): cukup perbarui status order.

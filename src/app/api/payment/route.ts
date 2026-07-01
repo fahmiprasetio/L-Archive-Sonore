@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { snap } from '@/lib/midtrans';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getUserFromRequest } from '@/lib/server-auth';
-import { validateCartItems, validateCustomerDetails } from '@/lib/validation';
+import { validateCartItems, validateCustomerDetails, validateCouponCode } from '@/lib/validation';
+import { validateCouponServer } from '@/lib/db/coupons';
 import { rateLimit, getClientIp, tooManyRequestsResponse } from '@/lib/rate-limit';
 import { readJsonLimited } from '@/lib/body-limit';
 import { calcShipping, calcTax } from '@/lib/pricing';
@@ -109,14 +110,41 @@ export async function POST(request: Request) {
       };
     });
 
-    // Hitung subtotal, ongkir, pajak. gross_amount = subtotal + shipping + tax.
     const subtotal = lineItems.reduce((sum, li) => sum + li.price * li.quantity, 0);
-    const shipping = calcShipping(subtotal);
-    const tax = calcTax(subtotal);
-    const grossAmount = subtotal + shipping + tax;
+
+    // Kupon (opsional) — divalidasi & dihitung ULANG di SERVER (otoritatif).
+    // Diskon dari klien TIDAK PERNAH dipercaya.
+    let discount = 0;
+    let appliedCoupon: string | null = null;
+    if (
+      body.couponCode !== undefined &&
+      body.couponCode !== null &&
+      String(body.couponCode).trim() !== ''
+    ) {
+      const codeResult = validateCouponCode(body.couponCode);
+      if (!codeResult.ok) {
+        return NextResponse.json({ error: codeResult.error }, { status: 400 });
+      }
+      const couponResult = await validateCouponServer(codeResult.value, subtotal);
+      if (!couponResult.ok) {
+        return NextResponse.json(
+          { error: couponResult.error || 'Kupon tidak valid' },
+          { status: 400 }
+        );
+      }
+      discount = couponResult.discount || 0;
+      appliedCoupon = couponResult.coupon?.code ?? null;
+    }
+
+    // Ongkir & pajak dihitung dari subtotal SETELAH diskon.
+    // gross_amount = (subtotal - discount) + shipping + tax.
+    const discountedSubtotal = Math.max(0, subtotal - discount);
+    const shipping = calcShipping(discountedSubtotal);
+    const tax = calcTax(discountedSubtotal);
+    const grossAmount = discountedSubtotal + shipping + tax;
 
     // item_details harus berjumlah sama dengan gross_amount (syarat Midtrans),
-    // jadi ongkir & pajak ditambahkan sebagai baris tersendiri.
+    // jadi diskon (baris negatif), ongkir & pajak ditambahkan sebagai baris tersendiri.
     const itemDetails: Array<{ id: string; price: number; quantity: number; name: string }> =
       lineItems.map((li) => ({
         id: li.id,
@@ -124,6 +152,14 @@ export async function POST(request: Request) {
         quantity: li.quantity,
         name: li.name.substring(0, 50), // Midtrans character limit
       }));
+    if (discount > 0) {
+      itemDetails.push({
+        id: 'DISCOUNT',
+        price: -discount,
+        quantity: 1,
+        name: (appliedCoupon ? `Discount (${appliedCoupon})` : 'Discount').substring(0, 50),
+      });
+    }
     if (shipping > 0) {
       itemDetails.push({ id: 'SHIPPING', price: shipping, quantity: 1, name: 'Shipping' });
     }
@@ -173,6 +209,8 @@ export async function POST(request: Request) {
           quantity: li.quantity,
         })),
         total: grossAmount,
+        discount,
+        coupon_code: appliedCoupon,
         status: 'pending',
       });
     } catch (e) {

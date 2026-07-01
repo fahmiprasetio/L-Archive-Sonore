@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { toast } from '@/store/toastStore';
-import { calcOrderSummary, FREE_SHIPPING_THRESHOLD } from '@/lib/pricing';
-import { ArrowLeft, CreditCard } from 'lucide-react';
+import { calcSummaryWithDiscount, FREE_SHIPPING_THRESHOLD } from '@/lib/pricing';
+import { ArrowLeft, CreditCard, Tag, X } from 'lucide-react';
 import Script from 'next/script';
 
 declare global {
@@ -16,11 +16,16 @@ declare global {
   }
 }
 
+// Snap script mengikuti mode Midtrans (sandbox saat dev, production saat live).
+const SNAP_SRC =
+  process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
+    ? 'https://app.midtrans.com/snap/snap.js'
+    : 'https://app.sandbox.midtrans.com/snap/snap.js';
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
   const totalPrice = getTotalPrice();
-  const summary = calcOrderSummary(totalPrice);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -30,9 +35,52 @@ export default function CheckoutPage() {
 
   const [loading, setLoading] = useState(false);
 
+  // Kupon
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(
+    null
+  );
+  const [couponError, setCouponError] = useState('');
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+
+  const discount = appliedCoupon?.discount ?? 0;
+  const summary = calcSummaryWithDiscount(totalPrice, discount);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code || applyingCoupon) return;
+    setApplyingCoupon(true);
+    setCouponError('');
+    try {
+      const res = await fetch('/api/coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal: totalPrice }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.valid) {
+        setAppliedCoupon(null);
+        setCouponError(data.error || 'Kupon tidak valid');
+        return;
+      }
+      setAppliedCoupon({ code: data.code, discount: data.discount });
+      toast.success(`Kupon ${data.code} diterapkan!`);
+    } catch {
+      setCouponError('Gagal memeriksa kupon. Coba lagi.');
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
   };
 
   const handlePayment = async (e: React.FormEvent) => {
@@ -61,6 +109,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items,
           customerDetails: formData,
+          couponCode: appliedCoupon?.code,
         }),
       });
 
@@ -210,11 +259,56 @@ export default function CheckoutPage() {
             ))}
           </div>
 
+          {/* Kupon */}
+          <div className="border-t border-gray-200 pt-4 space-y-2">
+            <label htmlFor="coupon" className="flex items-center gap-1.5 text-sm font-medium text-neutral-700">
+              <Tag className="h-4 w-4" /> Kode Kupon
+            </label>
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between rounded border border-green-200 bg-green-50 px-3 py-2">
+                <span className="text-sm font-semibold text-green-700">{appliedCoupon.code}</span>
+                <button
+                  type="button"
+                  onClick={removeCoupon}
+                  className="inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-900"
+                >
+                  <X className="h-3.5 w-3.5" /> Hapus
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  id="coupon"
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  placeholder="mis. WELCOME10"
+                  className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={applyCoupon}
+                  disabled={applyingCoupon || !couponInput.trim()}
+                  className="rounded bg-neutral-900 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800 transition disabled:opacity-50"
+                >
+                  {applyingCoupon ? '...' : 'Terapkan'}
+                </button>
+              </div>
+            )}
+            {couponError && <p className="text-xs text-red-600">{couponError}</p>}
+          </div>
+
           <div className="border-t border-gray-200 pt-4 space-y-2 text-sm">
             <div className="flex justify-between text-neutral-600">
               <span>Subtotal</span>
               <span className="font-semibold text-neutral-900">${summary.subtotal.toLocaleString('en-US')}</span>
             </div>
+            {summary.discount > 0 && (
+              <div className="flex justify-between text-green-700">
+                <span>Diskon{appliedCoupon ? ` (${appliedCoupon.code})` : ''}</span>
+                <span className="font-semibold">-${summary.discount.toLocaleString('en-US')}</span>
+              </div>
+            )}
             <div className="flex justify-between text-neutral-600">
               <span>Shipping</span>
               {summary.shipping === 0 ? (
@@ -225,7 +319,7 @@ export default function CheckoutPage() {
             </div>
             {summary.shipping > 0 && (
               <p className="text-xs text-sage-primary">
-                Tambah ${(FREE_SHIPPING_THRESHOLD - summary.subtotal).toLocaleString('en-US')} lagi untuk gratis ongkir
+                Tambah ${(FREE_SHIPPING_THRESHOLD - (summary.subtotal - summary.discount)).toLocaleString('en-US')} lagi untuk gratis ongkir
               </p>
             )}
             <div className="flex justify-between text-neutral-600">
@@ -240,7 +334,7 @@ export default function CheckoutPage() {
         </div>
       </div>
       <Script
-        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        src={SNAP_SRC}
         data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
         strategy="lazyOnload"
       />

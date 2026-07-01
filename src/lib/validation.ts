@@ -98,6 +98,20 @@ export function validateCustomerDetails(input: unknown): ValidationResult<Valida
   };
 }
 
+// ---- Coupon code (untuk /api/coupon & /api/payment) ----
+
+export function validateCouponCode(input: unknown): ValidationResult<string> {
+  if (typeof input !== 'string') return { ok: false, error: 'Invalid coupon code' };
+  const code = input.trim().toUpperCase();
+  if (code.length < 2 || code.length > 40) {
+    return { ok: false, error: 'Coupon code has invalid length' };
+  }
+  if (!/^[A-Z0-9_-]+$/.test(code)) {
+    return { ok: false, error: 'Coupon code has invalid characters' };
+  }
+  return { ok: true, value: code };
+}
+
 // ---- Product (untuk /api/admin/products) ----
 
 export interface ValidatedProductInput {
