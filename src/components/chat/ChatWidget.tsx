@@ -100,7 +100,7 @@ export default function ChatWidget() {
             {loading && (
               <div className="flex justify-start">
                 <div className="rounded-2xl rounded-bl-sm border border-[#B91C1C]/15 bg-white px-3 py-2 text-sm text-[#292B29]/60">
-                  Mengetik\u2026
+                  Mengetik…
                 </div>
               </div>
             )}
@@ -114,7 +114,7 @@ export default function ChatWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 rows={1}
-                placeholder="Tanya apa saja soal produk\u2026"
+                placeholder="Tanya apa saja soal produk…"
                 className="flex-1 resize-none rounded-lg border border-[#292B29]/20 bg-white px-3 py-2 text-sm text-[#292B29] focus:border-[#B91C1C] focus:outline-none"
               />
               <button
