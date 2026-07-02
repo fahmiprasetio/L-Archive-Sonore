@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { ArrowLeft, Minus, Plus, ZoomIn } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useProductStore } from '@/store/productStore';
-import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
+import {
+  PRODUCTS as MOCK_PRODUCTS,
+  getLongDescription,
+  getProductSpecs,
+} from '@/lib/products';
 import { toast } from '@/store/toastStore';
 import WishlistButton from '@/components/product/WishlistButton';
 import ProductReviews from '@/components/product/ProductReviews';
@@ -17,8 +21,6 @@ import type { Product } from '@/types';
 interface PageProps {
   params: Promise<{ id: string }>;
 }
-
-type ProductWithSpecs = Product & { specs?: string[]; longDescription?: string };
 
 export default function ProductDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
@@ -44,18 +46,16 @@ export default function ProductDetailPage({ params }: PageProps) {
     setLightboxOpen(false);
   }, [id]);
 
-  const product = useMemo<ProductWithSpecs | undefined>(() => {
+  const product = useMemo<Product | undefined>(() => {
     const fromStore = products.find((p) => p.id === id);
     const fromMock = MOCK_PRODUCTS.find((p) => p.id === id);
-    if (fromStore) {
-      return {
-        ...fromStore,
-        specs: fromMock?.specs,
-        longDescription: fromMock?.longDescription,
-      };
-    }
-    return fromMock;
+    return fromStore ?? fromMock;
   }, [products, id]);
+
+  // Deskripsi panjang & spesifikasi dicocokkan lewat NAMA produk,
+  // supaya berlaku baik untuk produk mock maupun produk dari database (id UUID).
+  const longDescription = getLongDescription(product?.name);
+  const specs = getProductSpecs(product?.name);
 
   // Galeri gambar: pakai product.images bila ada, jika tidak fallback ke image_url.
   const gallery = useMemo<string[]>(() => {
@@ -186,17 +186,17 @@ export default function ProductDetailPage({ params }: PageProps) {
               {product.description}
             </p>
 
-            {product.longDescription && (
+            {longDescription && (
               <p className="text-neutral-600 leading-relaxed">
-                {product.longDescription}
+                {longDescription}
               </p>
             )}
 
-            {product.specs && product.specs.length > 0 && (
+            {specs && specs.length > 0 && (
               <div className="pt-4 border-t border-gray-100">
                 <h3 className="font-semibold text-neutral-950 mb-2">Specifications</h3>
                 <ul className="list-disc list-inside space-y-1 text-sm text-neutral-600">
-                  {product.specs.map((spec, index) => (
+                  {specs.map((spec, index) => (
                     <li key={index}>{spec}</li>
                   ))}
                 </ul>

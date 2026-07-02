@@ -127,3 +127,28 @@ export const PRODUCTS: ProductWithSpecs[] = [
     specs: ['Poplar/Mahogany Shells', 'Opti-Loc Mounting System', 'Remo Drum Heads', 'Complete Hardware Pack']
   }
 ];
+
+// ---------------------------------------------------------------------------
+// Lookup berdasarkan NAMA produk (dinormalisasi).
+// Produk dari database memakai id UUID yang berbeda dari data mock di atas,
+// jadi deskripsi panjang & spesifikasi dicocokkan lewat nama agar tetap tampil.
+// ---------------------------------------------------------------------------
+
+const LONG_DESC_BY_NAME: Record<string, string> = {};
+const SPECS_BY_NAME: Record<string, string[]> = {};
+
+for (const p of PRODUCTS) {
+  const key = p.name.trim().toLowerCase();
+  if (p.longDescription) LONG_DESC_BY_NAME[key] = p.longDescription;
+  if (p.specs && p.specs.length > 0) SPECS_BY_NAME[key] = p.specs;
+}
+
+export function getLongDescription(name?: string | null): string | undefined {
+  if (!name) return undefined;
+  return LONG_DESC_BY_NAME[name.trim().toLowerCase()];
+}
+
+export function getProductSpecs(name?: string | null): string[] | undefined {
+  if (!name) return undefined;
+  return SPECS_BY_NAME[name.trim().toLowerCase()];
+}
