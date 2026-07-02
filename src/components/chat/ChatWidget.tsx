@@ -65,18 +65,18 @@ export default function ChatWidget() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Tutup asisten' : 'Buka asisten belanja'}
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg transition hover:bg-neutral-800"
+        className="fixed bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[#B91C1C] text-[#F0F0F0] shadow-lg transition hover:bg-[#991B1B]"
       >
-        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        {open ? <X className="h-[18px] w-[18px]" /> : <MessageCircle className="h-[18px] w-[18px]" />}
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-5 z-50 flex h-[30rem] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
-          <div className="flex items-center gap-2 border-b border-gray-100 bg-neutral-900 px-4 py-3 text-white">
+        <div className="fixed bottom-20 right-5 z-50 flex h-[30rem] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-[#B91C1C]/20 bg-[#F0F0F0] shadow-2xl">
+          <div className="flex items-center gap-2 bg-[#B91C1C] px-4 py-3 text-[#F0F0F0]">
             <Bot className="h-5 w-5" />
             <div>
               <p className="text-sm font-semibold leading-tight">Sonora</p>
-              <p className="text-[11px] text-neutral-300">L&apos;Archive Sonore</p>
+              <p className="text-[11px] text-[#F0F0F0]/75">L&apos;Archive Sonore</p>
             </div>
           </div>
 
@@ -89,8 +89,8 @@ export default function ChatWidget() {
                 <div
                   className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
                     m.role === 'user'
-                      ? 'rounded-br-sm bg-neutral-900 text-white'
-                      : 'rounded-bl-sm bg-gray-100 text-neutral-800'
+                      ? 'rounded-br-sm bg-[#B91C1C] text-[#F0F0F0]'
+                      : 'rounded-bl-sm border border-[#B91C1C]/15 bg-white text-[#292B29]'
                   }`}
                 >
                   {m.content}
@@ -99,7 +99,7 @@ export default function ChatWidget() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl rounded-bl-sm bg-gray-100 px-3 py-2 text-sm text-neutral-500">
+                <div className="rounded-2xl rounded-bl-sm border border-[#B91C1C]/15 bg-white px-3 py-2 text-sm text-[#292B29]/60">
                   Mengetik\u2026
                 </div>
               </div>
@@ -107,7 +107,7 @@ export default function ChatWidget() {
             <div ref={endRef} />
           </div>
 
-          <div className="border-t border-gray-100 p-2">
+          <div className="border-t border-[#B91C1C]/15 p-2">
             <div className="flex items-end gap-2">
               <textarea
                 value={input}
@@ -115,18 +115,18 @@ export default function ChatWidget() {
                 onKeyDown={onKeyDown}
                 rows={1}
                 placeholder="Tanya apa saja soal produk\u2026"
-                className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none"
+                className="flex-1 resize-none rounded-lg border border-[#292B29]/20 bg-white px-3 py-2 text-sm text-[#292B29] focus:border-[#B91C1C] focus:outline-none"
               />
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
                 aria-label="Kirim"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-neutral-900 text-white transition hover:bg-neutral-800 disabled:opacity-40"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#B91C1C] text-[#F0F0F0] transition hover:bg-[#991B1B] disabled:opacity-40"
               >
                 <Send className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-1 px-1 text-[10px] text-gray-400">
+            <p className="mt-1 px-1 text-[10px] text-[#292B29]/50">
               AI bisa keliru. Verifikasi detail penting.
             </p>
           </div>
