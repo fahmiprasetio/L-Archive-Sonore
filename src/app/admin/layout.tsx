@@ -5,11 +5,12 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { isAdminEmail } from '@/lib/admin';
-import { LayoutDashboard, Package, Users, ShieldCheck, ArrowLeft, Loader2, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Package, Users, ShieldCheck, ArrowLeft, Loader2, BarChart3, Ticket } from 'lucide-react';
 
 const NAV = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard },
   { href: '/admin/products', label: 'Products', icon: Package },
+  { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
   { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
   { href: '/admin/users', label: 'Users & Orders', icon: Users },
 ];
