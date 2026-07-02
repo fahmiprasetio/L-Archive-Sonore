@@ -99,7 +99,7 @@ export default function ProductDetailPage({ params }: PageProps) {
       <div className="py-12 text-center">
         <h2 className="text-2xl font-bold text-neutral-900">Product Not Found</h2>
         <p className="mt-2 text-neutral-600">The product you are looking for does not exist.</p>
-        <Link href="/" className="mt-6 inline-flex items-center gap-2 text-neutral-900 underline font-semibold">
+        <Link href="/shop" className="mt-6 inline-flex items-center gap-2 text-neutral-900 underline font-semibold">
           <ArrowLeft className="h-4 w-4" /> Back to Catalog
         </Link>
       </div>
@@ -121,7 +121,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   return (
     <div className="py-6 space-y-6">
-      <Link href="/" className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition">
+      <Link href="/shop" className="inline-flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition">
         <ArrowLeft className="h-4 w-4" /> Back to Catalog
       </Link>
 
