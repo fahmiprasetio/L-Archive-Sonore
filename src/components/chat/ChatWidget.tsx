@@ -65,14 +65,14 @@ export default function ChatWidget() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Tutup asisten' : 'Buka asisten belanja'}
-        className="fixed bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[#B91C1C] text-[#F0F0F0] shadow-lg transition hover:bg-[#991B1B]"
+        className="fixed bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[#DC2626] text-[#F0F0F0] shadow-lg transition hover:bg-[#991B1B]"
       >
         {open ? <X className="h-[18px] w-[18px]" /> : <MessageCircle className="h-[18px] w-[18px]" />}
       </button>
 
       {open && (
-        <div className="fixed bottom-20 right-5 z-50 flex h-[30rem] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-[#B91C1C]/20 bg-[#F0F0F0] shadow-2xl">
-          <div className="flex items-center gap-2 bg-[#B91C1C] px-4 py-3 text-[#F0F0F0]">
+        <div className="fixed bottom-20 right-5 z-50 flex h-[30rem] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-[#DC2626]/20 bg-[#F0F0F0] shadow-2xl">
+          <div className="flex items-center gap-2 bg-[#DC2626] px-4 py-3 text-[#F0F0F0]">
             <Bot className="h-5 w-5" />
             <div>
               <p className="text-sm font-semibold leading-tight">Sonora</p>
@@ -89,8 +89,8 @@ export default function ChatWidget() {
                 <div
                   className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
                     m.role === 'user'
-                      ? 'rounded-br-sm bg-[#B91C1C] text-[#F0F0F0]'
-                      : 'rounded-bl-sm border border-[#B91C1C]/15 bg-white text-[#292B29]'
+                      ? 'rounded-br-sm bg-[#DC2626] text-[#F0F0F0]'
+                      : 'rounded-bl-sm border border-[#DC2626]/15 bg-white text-[#292B29]'
                   }`}
                 >
                   {m.content}
@@ -99,7 +99,7 @@ export default function ChatWidget() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl rounded-bl-sm border border-[#B91C1C]/15 bg-white px-3 py-2 text-sm text-[#292B29]/60">
+                <div className="rounded-2xl rounded-bl-sm border border-[#DC2626]/15 bg-white px-3 py-2 text-sm text-[#292B29]/60">
                   Mengetik…
                 </div>
               </div>
@@ -107,7 +107,7 @@ export default function ChatWidget() {
             <div ref={endRef} />
           </div>
 
-          <div className="border-t border-[#B91C1C]/15 p-2">
+          <div className="border-t border-[#DC2626]/15 p-2">
             <div className="flex items-end gap-2">
               <textarea
                 value={input}
@@ -115,13 +115,13 @@ export default function ChatWidget() {
                 onKeyDown={onKeyDown}
                 rows={1}
                 placeholder="Tanya apa saja soal produk…"
-                className="flex-1 resize-none rounded-lg border border-[#292B29]/20 bg-white px-3 py-2 text-sm text-[#292B29] focus:border-[#B91C1C] focus:outline-none"
+                className="flex-1 resize-none rounded-lg border border-[#292B29]/20 bg-white px-3 py-2 text-sm text-[#292B29] focus:border-[#DC2626] focus:outline-none"
               />
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
                 aria-label="Kirim"
-                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#B91C1C] text-[#F0F0F0] transition hover:bg-[#991B1B] disabled:opacity-40"
+                className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#DC2626] text-[#F0F0F0] transition hover:bg-[#991B1B] disabled:opacity-40"
               >
                 <Send className="h-4 w-4" />
               </button>
