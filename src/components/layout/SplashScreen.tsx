@@ -40,10 +40,9 @@ export default function SplashScreen() {
 
     let cancelled = false;
     let loaded = 0;
-    let windowReady = document.readyState === 'complete';
 
     const checkReady = () => {
-      if (loaded >= HERO_ASSETS.length && windowReady) {
+      if (loaded >= HERO_ASSETS.length) {
         readyRef.current = true;
       }
     };
@@ -60,16 +59,9 @@ export default function SplashScreen() {
       img.src = src;
     });
 
-    const onWindowLoad = () => {
-      windowReady = true;
-      checkReady();
-    };
-    if (!windowReady) window.addEventListener('load', onWindowLoad);
-
     // Jaring pengaman: apa pun kondisinya, splash pasti dilepas.
     const safety = window.setTimeout(() => {
       loaded = HERO_ASSETS.length;
-      windowReady = true;
       readyRef.current = true;
     }, SAFETY_TIMEOUT);
 
@@ -117,7 +109,6 @@ export default function SplashScreen() {
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
-      window.removeEventListener('load', onWindowLoad);
       window.clearTimeout(safety);
     };
   }, []);

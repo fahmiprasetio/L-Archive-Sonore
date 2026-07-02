@@ -71,23 +71,27 @@ const nextConfig: NextConfig = {
 //   diteruskan server ke Sentry. Ini menghindari ad-blocker sekaligus lolos
 //   CSP connect-src 'self' tanpa perlu whitelist domain ingest Sentry.
 // ============================================================================
-export default withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
+const isDev = process.env.NODE_ENV === "development";
 
-  // Diam saat tidak di CI agar log build bersih.
-  silent: !process.env.CI,
+export default isDev
+  ? nextConfig
+  : withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
 
-  // Perlebar cakupan upload source map sisi klien.
-  widenClientFileUpload: true,
+      // Diam saat tidak di CI agar log build bersih.
+      silent: !process.env.CI,
 
-  // Tunnel event lewat domain sendiri (lihat catatan CSP di atas).
-  tunnelRoute: "/monitoring",
+      // Perlebar cakupan upload source map sisi klien.
+      widenClientFileUpload: true,
 
-  // Hapus logger Sentry dari bundle produksi.
-  disableLogger: true,
+      // Tunnel event lewat domain sendiri (lihat catatan CSP di atas).
+      tunnelRoute: "/monitoring",
 
-  // Nonaktifkan telemetry build SDK.
-  telemetry: false,
-});
+      // Hapus logger Sentry dari bundle produksi.
+      disableLogger: true,
+
+      // Nonaktifkan telemetry build SDK.
+      telemetry: false,
+    });
