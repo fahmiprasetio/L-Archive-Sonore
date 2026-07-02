@@ -179,7 +179,11 @@ function ShopContent() {
   return (
     <div className="relative w-full text-[#2E3A2C]">
       {/* Hero fixed setinggi satu layar \u2014 diam saat scroll, jadi alas efek parallax. */}
-      <div className="fixed inset-0 -z-10 flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#3A4438] px-6 text-center">
+      <div
+        className="fixed inset-0 -z-10 flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-cover bg-center px-6 text-center"
+        style={{ backgroundImage: "url('/hero-shop.png')" }}
+      >
+        <div className="absolute inset-0 bg-black/30 -z-10" />
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-white uppercase font-clash">
           The Archive Shop
         </h1>
@@ -450,11 +454,10 @@ function ShopContent() {
                         <button
                           key={category}
                           onClick={() => toggleCategory(category)}
-                          className={`text-xs py-1.5 px-3 rounded-full border transition flex items-center gap-1.5 cursor-pointer ${
-                            isChecked
-                              ? 'bg-brand-primary/10 border-brand-primary text-brand-primary font-semibold'
-                              : 'border-neutral-200 text-neutral-600 hover:border-neutral-300 bg-neutral-50 hover:bg-neutral-100'
-                          }`}
+                          className={`text-xs py-1.5 px-3 rounded-full border transition flex items-center gap-1.5 cursor-pointer ${isChecked
+                            ? 'bg-brand-primary/10 border-brand-primary text-brand-primary font-semibold'
+                            : 'border-neutral-200 text-neutral-600 hover:border-neutral-300 bg-neutral-50 hover:bg-neutral-100'
+                            }`}
                         >
                           {category}
                           <span className={`text-[10px] rounded-full px-1.5 py-0.2 ${isChecked ? 'bg-brand-primary/20 text-brand-primary' : 'bg-neutral-200 text-neutral-500'}`}>
@@ -564,11 +567,10 @@ function ShopContent() {
                         <button
                           key={n}
                           onClick={() => setCurrentPage(n)}
-                          className={`min-w-9 px-3 py-1.5 text-xs font-bold rounded-lg border transition cursor-pointer ${
-                            n === safePage
-                              ? 'bg-brand-primary border-brand-primary text-white'
-                              : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'
-                          }`}
+                          className={`min-w-9 px-3 py-1.5 text-xs font-bold rounded-lg border transition cursor-pointer ${n === safePage
+                            ? 'bg-brand-primary border-brand-primary text-white'
+                            : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'
+                            }`}
                         >
                           {n}
                         </button>
