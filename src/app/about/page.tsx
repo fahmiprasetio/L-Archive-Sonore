@@ -47,7 +47,7 @@ export default function AboutPage() {
       {/* Hero banner */}
       <section className="relative overflow-hidden rounded-3xl border border-neutral-800">
         <div className="absolute inset-0 bg-cover bg-center" style={heroBg} />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2E3A2C] via-[#2E3A2C]/80 to-[#2E3A2C]/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#441004] via-[#441004]/80 to-[#441004]/40" />
         <div className="relative z-10 flex min-h-[420px] flex-col items-center justify-center px-6 py-20 text-center text-white">
           <span className="rounded-full border border-white/30 px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/80">
             Est. 2026
@@ -61,7 +61,7 @@ export default function AboutPage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#2E3A2C] transition hover:bg-neutral-200"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-xs font-semibold uppercase tracking-widest text-[#441004] transition hover:bg-neutral-200"
             >
               Browse Catalog <ArrowRight className="h-4 w-4" />
             </Link>

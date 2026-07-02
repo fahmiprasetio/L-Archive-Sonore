@@ -11,7 +11,7 @@ interface Msg {
 const GREETING: Msg = {
   role: 'assistant',
   content:
-    "Hai! Saya asisten L'Archive Sonore. Cari gitar, piano, drum, atau synth? Ceritakan kebutuhan atau budget Anda.",
+    "Halo! Saya asisten L'Archive Sonore. Saya bisa bantu merekomendasikan alat musik (gitar, piano, drum, synth, biola, bass). Coba sebutkan kebutuhan atau budget Anda.",
 };
 
 export default function ChatWidget() {
@@ -41,7 +41,7 @@ export default function ChatWidget() {
         }),
       });
       const data = await res.json();
-      const reply: string = data?.reply || data?.error || 'Maaf, terjadi kendala. Coba lagi.';
+      const reply: string = data?.reply || 'Maaf, terjadi kendala. Coba lagi.';
       setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
     } catch {
       setMessages((prev) => [
@@ -75,7 +75,7 @@ export default function ChatWidget() {
           <div className="flex items-center gap-2 border-b border-gray-100 bg-neutral-900 px-4 py-3 text-white">
             <Bot className="h-5 w-5" />
             <div>
-              <p className="text-sm font-semibold leading-tight">Shopping Assistant</p>
+              <p className="text-sm font-semibold leading-tight">Sonora</p>
               <p className="text-[11px] text-neutral-300">L&apos;Archive Sonore</p>
             </div>
           </div>

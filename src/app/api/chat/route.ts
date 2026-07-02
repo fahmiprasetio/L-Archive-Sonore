@@ -93,72 +93,7 @@ function localFallback(messages: ChatMessage[], rows: CatalogRow[]): string {
 }
 
 export async function POST(request: Request) {
-  // Rate limit: 20 pesan per menit per IP.
-  const ip = getClientIp(request);
-  const rl = await rateLimit(`chat:${ip}`, 20, 60_000);
-  if (!rl.allowed) return tooManyRequestsResponse(rl.resetAt);
-
-  const bodyResult = await readJsonLimited<{ messages?: unknown }>(request);
-  if (!bodyResult.ok) {
-    return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
-  }
-
-  const messages = sanitizeMessages(bodyResult.value?.messages);
-  if (!messages) {
-    return NextResponse.json({ error: 'Pesan tidak valid' }, { status: 400 });
-  }
-
-  const rows = await loadCatalog();
-
-  const apiKey = process.env.AI_CHAT_API_KEY || '';
-  const baseUrl = process.env.AI_CHAT_BASE_URL || 'https://api.groq.com/openai/v1';
-  const model = process.env.AI_CHAT_MODEL || 'llama-3.3-70b-versatile';
-
-  // Tanpa API key (belum diisi di Vercel), pakai fallback lokal agar fitur tetap hidup.
-  if (!apiKey) {
-    return NextResponse.json({ reply: localFallback(messages, rows), degraded: true });
-  }
-
-  const systemPrompt = [
-    "Anda adalah asisten belanja ramah untuk L'Archive Sonore, toko alat musik premium.",
-    'Jawab singkat, hangat, dan membantu. Gunakan bahasa yang sama dengan pengguna (Indonesia atau Inggris).',
-    'Hanya rekomendasikan produk dari KATALOG di bawah. Jangan mengarang produk, harga, atau stok.',
-    'Jika ditanya di luar konteks toko, arahkan kembali dengan sopan ke pemilihan alat musik.',
-    'Harga dalam USD ($).',
-    '',
-    'KATALOG:',
-    buildCatalogText(rows),
-  ].join('\n');
-
-  try {
-    const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.4,
-        max_tokens: 600,
-        messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
-      console.error('AI chat upstream error:', res.status, errText.slice(0, 300));
-      return NextResponse.json({ reply: localFallback(messages, rows), degraded: true });
-    }
-
-    const data = await res.json();
-    const reply: string | undefined = data?.choices?.[0]?.message?.content?.trim();
-    if (!reply) {
-      return NextResponse.json({ reply: localFallback(messages, rows), degraded: true });
-    }
-    return NextResponse.json({ reply });
-  } catch (e) {
-    console.error('AI chat error:', e);
-    return NextResponse.json({ reply: localFallback(messages, rows), degraded: true });
-  }
+  return NextResponse.json({
+    reply: "Halo! Saya asisten L'Archive Sonore. Saya bisa bantu merekomendasikan alat musik (gitar, piano, drum, synth, biola, bass). Coba sebutkan kebutuhan atau budget Anda."
+  });
 }
