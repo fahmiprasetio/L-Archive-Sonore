@@ -4,11 +4,35 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/components/product/ProductCard';
 import { PRODUCTS as MOCK_PRODUCTS } from '@/lib/products';
+import { ShieldCheck, BadgeCheck, RotateCcw, Truck } from 'lucide-react';
 
 const heroStyle: React.CSSProperties = {
   backgroundImage: "url('/HERO_SECTION.png')",
   aspectRatio: '1280/806',
 };
+
+const promises = [
+  {
+    icon: ShieldCheck,
+    title: 'Secure Checkout',
+    desc: 'Every transaction is encrypted and protected end to end.',
+  },
+  {
+    icon: BadgeCheck,
+    title: 'Authenticity Guaranteed',
+    desc: 'Each instrument is verified and documented by our specialists.',
+  },
+  {
+    icon: RotateCcw,
+    title: 'Easy Returns',
+    desc: 'Fourteen days to ensure your instrument feels right.',
+  },
+  {
+    icon: Truck,
+    title: 'Insured Shipping',
+    desc: 'Fully insured, climate-conscious delivery worldwide.',
+  },
+];
 
 export default function Home() {
   const heroRef = useRef<HTMLElement>(null);
@@ -114,7 +138,7 @@ export default function Home() {
         </div>
 
         {/* Section merah — z-10, di belakang awan */}
-        <div className="relative z-10 bg-[#441004] w-full text-white pb-[36rem] -mt-[12%]">
+        <div className="relative z-10 bg-[#441004] w-full text-white pb-40 -mt-[12%]">
           {/* Brand Intro Callout Section */}
           <div className="max-w-4xl mx-auto px-6 pt-66 pb-40 text-center flex flex-col items-center justify-center space-y-8 select-none">
             <h2 className="font-clash font-medium text-white text-2xl sm:text-3xl md:text-4xl uppercase tracking-widest leading-none">
@@ -154,6 +178,45 @@ export default function Home() {
               >
                 View All Instruments &rarr;
               </Link>
+            </div>
+          </section>
+
+          {/* The Archive Promise — trust signals */}
+          <section id="promise" className="max-w-6xl mx-auto px-6 pt-16 pb-20 space-y-10">
+            <div className="border-b border-white/20 pb-6">
+              <h2 className="text-3xl font-bold tracking-widest text-white font-clash uppercase">
+                The Archive Promise
+              </h2>
+              <p className="text-sm text-neutral-300 mt-2 font-light tracking-wide uppercase">
+                Our commitment with every instrument
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10">
+              {promises.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.title}
+                    className="group bg-[#441004] hover:bg-[#4f1607] transition-colors duration-300 p-8 flex flex-col gap-6"
+                  >
+                    <div className="flex items-center justify-between">
+                      <Icon className="w-7 h-7 text-white/90" strokeWidth={1.25} />
+                      <span className="font-cormorant italic text-2xl text-white/40">
+                        0{index + 1}
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-clash uppercase tracking-widest text-sm text-white">
+                        {item.title}
+                      </h3>
+                      <p className="font-light text-sm leading-relaxed text-neutral-300">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         </div>
