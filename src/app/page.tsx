@@ -142,7 +142,7 @@ export default function Home() {
             </div>
 
             {/* Carousel — scroll ke samping, hanya 5 barang */}
-            <div className="featured-scroll -mx-6 px-6 overflow-x-auto pb-6">
+            <div className="featured-scroll overflow-x-auto pb-6">
               <div className="flex gap-4 snap-x snap-mandatory">
                 {MOCK_PRODUCTS.slice(0, 5).map((product) => (
                   <div key={product.id} className="snap-start shrink-0 w-80">
@@ -156,7 +156,7 @@ export default function Home() {
             <div className="flex justify-center pt-2">
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-10 py-3 text-[10px] tracking-widest uppercase text-white/90 hover:bg-white hover:text-[#441004] transition duration-300 font-sans"
+                className="inline-flex items-center gap-2 rounded-none border border-white/30 px-12 py-3.5 text-sm tracking-widest uppercase text-white/90 hover:bg-white hover:text-[#441004] transition duration-300 font-sans"
               >
                 View All Instruments &rarr;
               </Link>

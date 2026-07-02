@@ -17,18 +17,16 @@ export default function ProductCard({ product, dark = false }: ProductCardProps)
 
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-lg border shadow-sm transition ${
-        dark
-          ? 'border-white/10 bg-black/20 backdrop-blur-md'
-          : 'border-gray-200 bg-white'
-      }`}
+      className={`flex flex-col overflow-hidden rounded-lg border shadow-sm transition ${dark
+        ? 'border-gray-300/50 bg-black/10 backdrop-blur-sm text-white'
+        : 'border-gray-200 bg-white'
+        }`}
     >
       {/* Gambar: padding tipis (p-2) supaya gambar terasa lebih luas di dalam kartu */}
       <Link href={`/products/${product.id}`} className="block p-2">
         <div
-          className={`relative aspect-square w-full overflow-hidden rounded flex items-center justify-center transition hover:opacity-90 ${
-            dark ? 'bg-white/5 text-white/40' : 'bg-gray-100 text-gray-400'
-          }`}
+          className={`relative aspect-square w-full overflow-hidden rounded flex items-center justify-center transition hover:opacity-90 ${dark ? 'bg-gray-200/50 text-gray-400' : 'bg-gray-100 text-gray-400'
+            }`}
         >
           {product.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -43,11 +41,6 @@ export default function ProductCard({ product, dark = false }: ProductCardProps)
           {soldOut && (
             <span className="absolute top-2 left-2 rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
               Sold Out
-            </span>
-          )}
-          {!soldOut && lowStock && (
-            <span className="absolute top-2 left-2 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-              {product.stock} left
             </span>
           )}
         </div>
@@ -70,13 +63,12 @@ export default function ProductCard({ product, dark = false }: ProductCardProps)
           <button
             onClick={() => addItem(product)}
             disabled={soldOut}
-            className={`rounded px-3 py-1.5 text-xs font-semibold transition duration-200 ${
-              soldOut
-                ? 'cursor-not-allowed bg-neutral-300 text-neutral-500'
-                : dark
+            className={`rounded px-3 py-1.5 text-xs font-semibold transition duration-200 ${soldOut
+              ? 'cursor-not-allowed bg-neutral-300 text-neutral-500'
+              : dark
                 ? 'bg-[#EFE6D3] text-[#441004] hover:bg-[#E5D8BD]'
                 : 'bg-sage-primary text-white hover:bg-sage-secondary'
-            }`}
+              }`}
           >
             {soldOut ? 'Sold Out' : 'Add to Cart'}
           </button>

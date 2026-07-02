@@ -73,7 +73,7 @@ export default function Navbar() {
   // Karena keduanya sama (44px), judul "meluncur" mulus, bukan meloncat.
   // ==========================================================================
   const headerState = isScrolled
-    ? 'top-4 left-6 w-[20rem] max-w-[calc(100vw-3rem)] rounded-lg bg-black/40 backdrop-blur-sm border border-white/10 py-2.5 px-5 shadow-xl'
+    ? 'top-4 left-4 w-[21.25rem] max-w-[calc(100vw-3rem)] rounded-md bg-black/30 backdrop-blur-md border border-white/20 py-2.5 px-5 shadow-xl'
     : isOpen
       ? darkHero
         ? 'top-0 left-0 w-full bg-black/5 backdrop-blur-md border border-transparent border-b-white/10 py-5 px-11'

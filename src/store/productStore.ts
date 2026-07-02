@@ -12,7 +12,7 @@ import type { ProductInput } from '@/lib/db/products';
 
 export type { ProductInput };
 
-const LOCAL_KEY = 'las-products-store-v2';
+const LOCAL_KEY = 'las-products-store-v3';
 const dbMode = isSupabaseConfigured();
 
 function readLocal(): Product[] {
