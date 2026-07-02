@@ -149,38 +149,6 @@ export default function Home() {
             </p>
           </div>
 
-          <section id="featured" className="max-w-6xl mx-auto px-6 pt-16 pb-20 space-y-10">
-            <div className="border-b border-white/20 pb-6">
-              <h2 className="text-3xl font-bold tracking-widest text-white font-clash uppercase">
-                Featured Instruments
-              </h2>
-              <p className="text-sm text-neutral-300 mt-2 font-light tracking-wide uppercase">
-                Select items from our active collection
-              </p>
-            </div>
-
-            {/* Carousel — scroll ke samping, hanya 5 barang */}
-            <div className="featured-scroll overflow-x-auto pb-6">
-              <div className="flex gap-4 snap-x snap-mandatory">
-                {MOCK_PRODUCTS.slice(0, 5).map((product) => (
-                  <div key={product.id} className="snap-start shrink-0 w-80">
-                    <ProductCard product={product} dark />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Tombol ke halaman shop (semua barang) */}
-            <div className="flex justify-center pt-2">
-              <Link
-                href="/shop"
-                className="inline-flex items-center gap-2 rounded-none border border-white/30 px-12 py-3.5 text-sm tracking-widest uppercase text-white/90 hover:bg-white hover:text-[#441004] transition duration-300 font-sans"
-              >
-                View All Instruments &rarr;
-              </Link>
-            </div>
-          </section>
-
           {/* The Archive Promise — trust signals */}
           <section id="promise" className="max-w-6xl mx-auto px-6 pt-16 pb-20 space-y-10">
             <div className="border-b border-white/20 pb-6">
@@ -217,6 +185,38 @@ export default function Home() {
                   </div>
                 );
               })}
+            </div>
+          </section>
+
+          <section id="featured" className="max-w-6xl mx-auto px-6 pt-16 pb-20 space-y-10">
+            <div className="border-b border-white/20 pb-6">
+              <h2 className="text-3xl font-bold tracking-widest text-white font-clash uppercase">
+                Featured Instruments
+              </h2>
+              <p className="text-sm text-neutral-300 mt-2 font-light tracking-wide uppercase">
+                Select items from our active collection
+              </p>
+            </div>
+
+            {/* Carousel — scroll ke samping, hanya 5 barang */}
+            <div className="featured-scroll overflow-x-auto pb-6">
+              <div className="flex gap-4 snap-x snap-mandatory">
+                {MOCK_PRODUCTS.slice(0, 5).map((product) => (
+                  <div key={product.id} className="snap-start shrink-0 w-80">
+                    <ProductCard product={product} dark />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tombol ke halaman shop (semua barang) */}
+            <div className="flex justify-center pt-2">
+              <Link
+                href="/shop"
+                className="inline-flex items-center gap-2 rounded-none border border-white/30 px-12 py-3.5 text-sm tracking-widest uppercase text-white/90 hover:bg-white hover:text-[#441004] transition duration-300 font-sans"
+              >
+                View All Instruments &rarr;
+              </Link>
             </div>
           </section>
         </div>
