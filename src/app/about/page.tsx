@@ -82,7 +82,7 @@ export default function AboutPage() {
             key={s.label}
             className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm"
           >
-            <p className="font-clash text-2xl font-bold text-sage-primary">{s.value}</p>
+            <p className="font-clash text-2xl font-bold text-[#441004]">{s.value}</p>
             <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
               {s.label}
             </p>
@@ -93,7 +93,7 @@ export default function AboutPage() {
       {/* Heritage & Mission */}
       <section className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
         <div className="order-2 space-y-5 lg:order-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-sage-primary">
+          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#441004]">
             Our Heritage
           </span>
           <h2 className="font-clash text-3xl font-medium uppercase tracking-wide text-neutral-900">
@@ -127,9 +127,9 @@ export default function AboutPage() {
             return (
               <div
                 key={v.title}
-                className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-sage-primary/40 hover:shadow-md"
+                className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-[#441004]/40 hover:shadow-md"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sage-primary/10 text-sage-primary transition group-hover:bg-sage-primary group-hover:text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#441004]/10 text-[#441004] transition group-hover:bg-[#441004] group-hover:text-white">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-4 text-lg font-bold text-neutral-900">{v.title}</h3>
@@ -157,7 +157,7 @@ export default function AboutPage() {
         </p>
         <Link
           href="/shop"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-sage-primary px-8 py-3 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-sage-secondary"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#441004] px-8 py-3 text-xs font-semibold uppercase tracking-widest text-white transition hover:bg-[#300a02]"
         >
           Explore the Collection <ArrowRight className="h-4 w-4" />
         </Link>
