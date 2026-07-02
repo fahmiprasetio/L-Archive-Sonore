@@ -8,7 +8,8 @@ import { useProductStore } from '@/store/productStore';
 import ProductCard from '@/components/product/ProductCard';
 import ProductCardSkeleton from '@/components/product/ProductCardSkeleton';
 
-const VALID_SORTS = ['default', 'price-asc', 'price-desc', 'name-asc', 'name-desc'];
+const VALID_SORTS = ['default', 'price-asc', 'price-desc', 'name-asc', 'name-desc', 'stock-desc'];
+const PAGE_SIZE = 15;
 
 function parsePrice(value: string | null): number | '' {
   if (value === null || value.trim() === '') return '';
@@ -32,7 +33,16 @@ function ShopContent() {
     const s = searchParams.get('sort');
     return s && VALID_SORTS.includes(s) ? s : 'default';
   });
+  const [inStockOnly, setInStockOnly] = useState<boolean>(() => searchParams.get('instock') === '1');
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const p = Number(searchParams.get('page'));
+    return Number.isFinite(p) && p >= 1 ? Math.floor(p) : 1;
+  });
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState<boolean>(() => {
+    const raw = searchParams.get('category');
+    return !!(raw && raw.trim());
+  });
 
   // Tulis state kembali ke URL (replace + debounce) agar URL selalu mencerminkan filter aktif.
   // Memakai replace (bukan push) supaya tidak membanjiri riwayat browser tiap ketikan.
@@ -49,6 +59,8 @@ function ShopContent() {
     if (minPrice !== '') params.set('min', String(minPrice));
     if (maxPrice !== '') params.set('max', String(maxPrice));
     if (sortBy !== 'default') params.set('sort', sortBy);
+    if (inStockOnly) params.set('instock', '1');
+    if (currentPage > 1) params.set('page', String(currentPage));
 
     const queryString = params.toString();
     const target = queryString ? `/shop?${queryString}` : '/shop';
@@ -57,7 +69,17 @@ function ShopContent() {
       router.replace(target, { scroll: false });
     }, 250);
     return () => clearTimeout(timeout);
-  }, [searchQuery, selectedCategories, minPrice, maxPrice, sortBy, router]);
+  }, [searchQuery, selectedCategories, minPrice, maxPrice, sortBy, inStockOnly, currentPage, router]);
+
+  // Reset ke halaman 1 setiap kali filter/sort berubah (kecuali render pertama).
+  const isFirstFilterRun = useRef(true);
+  useEffect(() => {
+    if (isFirstFilterRun.current) {
+      isFirstFilterRun.current = false;
+      return;
+    }
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategories, minPrice, maxPrice, sortBy, inStockOnly]);
 
   // Sumber produk dari store (Supabase bila terkonfigurasi, jika tidak fallback lokal).
   const products = useProductStore((s) => s.products);
@@ -93,9 +115,12 @@ function ShopContent() {
       const matchesMinPrice = minPrice === '' || product.price >= minPrice;
       const matchesMaxPrice = maxPrice === '' || product.price <= maxPrice;
 
-      return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
+      const matchesStock =
+        !inStockOnly || !(typeof product.stock === 'number' && product.stock <= 0);
+
+      return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesStock;
     });
-  }, [allProducts, searchQuery, selectedCategories, minPrice, maxPrice]);
+  }, [allProducts, searchQuery, selectedCategories, minPrice, maxPrice, inStockOnly]);
 
   // Sort products logic
   const sortedProducts = useMemo(() => {
@@ -112,8 +137,20 @@ function ShopContent() {
     if (sortBy === 'name-desc') {
       return list.sort((a, b) => b.name.localeCompare(a.name));
     }
+    if (sortBy === 'stock-desc') {
+      const rank = (p: Product) => (typeof p.stock === 'number' && p.stock <= 0 ? 1 : 0);
+      return list.sort((a, b) => rank(a) - rank(b));
+    }
     return list;
   }, [filteredProducts, sortBy]);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, currentPage), totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const pageEnd = Math.min(pageStart + PAGE_SIZE, sortedProducts.length);
+  const pagedProducts = sortedProducts.slice(pageStart, pageEnd);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -127,6 +164,8 @@ function ShopContent() {
     setMinPrice('');
     setMaxPrice('');
     setSortBy('default');
+    setInStockOnly(false);
+    setCurrentPage(1);
   };
 
   const hasActiveFilters =
@@ -134,7 +173,8 @@ function ShopContent() {
     selectedCategories.length > 0 ||
     minPrice !== '' ||
     maxPrice !== '' ||
-    sortBy !== 'default';
+    sortBy !== 'default' ||
+    inStockOnly;
 
   return (
     <div className="relative w-full text-[#2E3A2C]">
@@ -214,6 +254,7 @@ function ShopContent() {
                   <option value="price-desc">Price: High to Low</option>
                   <option value="name-asc">Name: A-Z</option>
                   <option value="name-desc">Name: Z-A</option>
+                  <option value="stock-desc">Availability: In Stock First</option>
                 </select>
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
                   <ChevronDown className="h-3.5 w-3.5" />
@@ -221,41 +262,60 @@ function ShopContent() {
               </div>
             </div>
 
-            {/* Category Filter */}
+            {/* Category Filter — dropdown biar hemat tempat, checklist muncul saat dibuka */}
             <div className="mb-6 pb-6 border-b border-black/10">
-              <h3 className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 mb-3.5">
-                Categories
-              </h3>
-              <div className="space-y-2.5">
-                {categories.map((category) => {
-                  const isChecked = selectedCategories.includes(category);
-                  return (
-                    <label
-                      key={category}
-                      className="flex items-center justify-between group cursor-pointer text-sm text-neutral-600 hover:text-neutral-950 transition"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => toggleCategory(category)}
-                          className="h-4 w-4 rounded border-neutral-300 text-sage-primary focus:ring-sage-secondary cursor-pointer accent-sage-primary"
-                        />
-                        <span className={isChecked ? 'font-medium text-neutral-950' : ''}>
-                          {category}
+              <button
+                type="button"
+                onClick={() => setIsCategoriesOpen((o) => !o)}
+                className="w-full flex items-center justify-between cursor-pointer group"
+                aria-expanded={isCategoriesOpen}
+              >
+                <span className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 group-hover:text-neutral-800 transition">
+                  Categories
+                </span>
+                <span className="flex items-center gap-2">
+                  {selectedCategories.length > 0 && (
+                    <span className="text-[10px] font-bold bg-sage-primary/15 text-sage-primary rounded-full px-2 py-0.5">
+                      {selectedCategories.length}
+                    </span>
+                  )}
+                  <ChevronDown
+                    className={`h-4 w-4 text-neutral-400 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`}
+                  />
+                </span>
+              </button>
+              {isCategoriesOpen && (
+                <div className="space-y-2.5 mt-3.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {categories.map((category) => {
+                    const isChecked = selectedCategories.includes(category);
+                    return (
+                      <label
+                        key={category}
+                        className="flex items-center justify-between group cursor-pointer text-sm text-neutral-600 hover:text-neutral-950 transition"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => toggleCategory(category)}
+                            className="h-4 w-4 rounded border-neutral-300 text-sage-primary focus:ring-sage-secondary cursor-pointer accent-sage-primary"
+                          />
+                          <span className={isChecked ? 'font-medium text-neutral-950' : ''}>
+                            {category}
+                          </span>
+                        </div>
+                        <span className="text-xs bg-black/5 px-2 py-0.5 rounded-full text-neutral-500 group-hover:bg-black/10 group-hover:text-neutral-700 transition">
+                          {categoryCounts[category]}
                         </span>
-                      </div>
-                      <span className="text-xs bg-black/5 px-2 py-0.5 rounded-full text-neutral-500 group-hover:bg-black/10 group-hover:text-neutral-700 transition">
-                        {categoryCounts[category]}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Price Filter */}
-            <div>
+            <div className="mb-6 pb-6 border-b border-black/10">
               <h3 className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 mb-3.5">
                 Price Range ($)
               </h3>
@@ -282,6 +342,22 @@ function ShopContent() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Availability Filter */}
+            <div>
+              <h3 className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 mb-3.5">
+                Availability
+              </h3>
+              <label className="flex items-center gap-2.5 cursor-pointer text-sm text-neutral-600 hover:text-neutral-950 transition">
+                <input
+                  type="checkbox"
+                  checked={inStockOnly}
+                  onChange={(e) => setInStockOnly(e.target.checked)}
+                  className="h-4 w-4 rounded border-neutral-300 text-sage-primary focus:ring-sage-secondary cursor-pointer accent-sage-primary"
+                />
+                <span className={inStockOnly ? 'font-medium text-neutral-950' : ''}>In stock only</span>
+              </label>
             </div>
           </aside>
 
@@ -355,6 +431,7 @@ function ShopContent() {
                       <option value="price-desc">Price: High to Low</option>
                       <option value="name-asc">Name: A-Z</option>
                       <option value="name-desc">Name: Z-A</option>
+                      <option value="stock-desc">Availability: In Stock First</option>
                     </select>
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
                       <ChevronDown className="h-3.5 w-3.5" />
@@ -417,37 +494,46 @@ function ShopContent() {
                     </div>
                   </div>
                 </div>
+
+                <div>
+                  <h3 className="font-clash text-xs font-bold uppercase tracking-widest text-neutral-500 mb-3">
+                    Availability
+                  </h3>
+                  <label className="flex items-center gap-2.5 cursor-pointer text-sm text-neutral-600">
+                    <input
+                      type="checkbox"
+                      checked={inStockOnly}
+                      onChange={(e) => setInStockOnly(e.target.checked)}
+                      className="h-4 w-4 rounded border-neutral-300 text-sage-primary focus:ring-sage-secondary cursor-pointer accent-sage-primary"
+                    />
+                    <span className={inStockOnly ? 'font-medium text-neutral-950' : ''}>In stock only</span>
+                  </label>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Shop Main Products Display Column — kanan sekarang hanya card barang */}
+          {/* Shop Main Products Display Column — kanan hanya card barang + pagination di bawah */}
           <div className="flex-grow w-full min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-              <p className="text-xs text-[#2E3A2C]/70 font-semibold uppercase tracking-wider">
-                Showing <span className="text-[#2E3A2C] font-bold">{sortedProducts.length}</span> of {allProducts.length} Instruments
-              </p>
-
-              {selectedCategories.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 items-center">
-                  <span className="text-[10px] text-[#2E3A2C]/60 uppercase tracking-widest font-bold mr-1">Active:</span>
-                  {selectedCategories.map((cat) => (
-                    <span
-                      key={cat}
-                      className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-[#2E3A2C]/10 text-[#2E3A2C] border border-[#2E3A2C]/20 pl-2 pr-1.5 py-0.5 rounded-full"
+            {selectedCategories.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 items-center mb-6">
+                <span className="text-[10px] text-[#2E3A2C]/60 uppercase tracking-widest font-bold mr-1">Active:</span>
+                {selectedCategories.map((cat) => (
+                  <span
+                    key={cat}
+                    className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-[#2E3A2C]/10 text-[#2E3A2C] border border-[#2E3A2C]/20 pl-2 pr-1.5 py-0.5 rounded-full"
+                  >
+                    {cat}
+                    <button
+                      onClick={() => toggleCategory(cat)}
+                      className="hover:text-[#2E3A2C]/60 transition cursor-pointer"
                     >
-                      {cat}
-                      <button
-                        onClick={() => toggleCategory(cat)}
-                        className="hover:text-[#2E3A2C]/60 transition cursor-pointer"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
 
             {!loaded ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -456,11 +542,51 @@ function ShopContent() {
                 ))}
               </div>
             ) : sortedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {sortedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {pagedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+
+                {/* Pagination + info jumlah, ditaruh di bawah */}
+                <div className="mt-10 flex flex-col items-center gap-4">
+                  {totalPages > 1 && (
+                    <nav className="flex flex-wrap items-center justify-center gap-1.5">
+                      <button
+                        onClick={() => setCurrentPage(safePage - 1)}
+                        disabled={safePage === 1}
+                        className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                      >
+                        Prev
+                      </button>
+                      {pageNumbers.map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => setCurrentPage(n)}
+                          className={`min-w-9 px-3 py-1.5 text-xs font-bold rounded-lg border transition cursor-pointer ${
+                            n === safePage
+                              ? 'bg-sage-primary border-sage-primary text-white'
+                              : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setCurrentPage(safePage + 1)}
+                        disabled={safePage === totalPages}
+                        className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                      >
+                        Next
+                      </button>
+                    </nav>
+                  )}
+                  <p className="text-xs text-[#2E3A2C]/70 font-semibold uppercase tracking-wider">
+                    Showing <span className="text-[#2E3A2C] font-bold">{pageStart + 1}–{pageEnd}</span> of {sortedProducts.length} Instruments
+                  </p>
+                </div>
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center text-center py-20 bg-white border border-neutral-200/80 rounded-xl shadow-sm px-6">
                 <SlidersHorizontal className="h-12 w-12 text-neutral-300 mb-4" />
