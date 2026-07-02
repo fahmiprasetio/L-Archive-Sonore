@@ -79,7 +79,7 @@ export default function Home() {
 
       {/* Wrapper: awan + section merah dalam satu stacking context */}
       <div className="relative -mt-[30%]">
-        {/* Awan — z-20 supaya di depan section merah */}
+        {/* Awan \u2014 z-20 supaya di depan section merah */}
         <div className="relative z-20 w-full select-none">
           <img
             src="/transisi_awan_1.png"
@@ -137,8 +137,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Section merah — z-10, di belakang awan */}
-        <div className="relative z-10 bg-[#441004] w-full text-white pb-72 -mt-[12%]">
+        {/* Section merah \u2014 z-10, di belakang awan */}
+        <div className="relative z-10 bg-[#441004] w-full text-white pb-[32rem] -mt-[12%]">
           {/* Brand Intro Callout Section */}
           <div className="max-w-4xl mx-auto px-6 pt-66 pb-40 text-center flex flex-col items-center justify-center space-y-8 select-none">
             <h2 className="font-clash font-medium text-white text-2xl sm:text-3xl md:text-4xl uppercase tracking-widest leading-none">
@@ -149,7 +149,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* The Archive Promise — trust signals */}
+          {/* The Archive Promise \u2014 trust signals */}
           <section id="promise" className="max-w-6xl mx-auto px-6 pt-16 pb-20 space-y-10">
             <div className="border-b border-white/20 pb-6">
               <h2 className="text-3xl font-bold tracking-widest text-white font-clash uppercase">
@@ -198,7 +198,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Carousel — scroll ke samping, hanya 5 barang */}
+            {/* Carousel \u2014 scroll ke samping, hanya 5 barang */}
             <div className="featured-scroll overflow-x-auto pb-6">
               <div className="flex gap-4 snap-x snap-mandatory">
                 {MOCK_PRODUCTS.slice(0, 5).map((product) => (
