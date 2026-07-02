@@ -22,6 +22,10 @@
   /* Brand Sage Green colors */
   --color-sage-primary: #8A9A86;
   --color-sage-secondary: #B6CEB4;
+
+  /* Brand red accent (halaman shop) \u2014 selaras dengan tema situs #441004 */
+  --color-brand-primary: #441004;
+  --color-brand-secondary: #5A1A0A;
   
   /* Font Clash Display */
   --font-clash: "Clash Display", sans-serif;

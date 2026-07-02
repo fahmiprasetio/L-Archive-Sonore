@@ -67,7 +67,7 @@ export default function ProductCard({ product, dark = false }: ProductCardProps)
               ? 'cursor-not-allowed bg-neutral-300 text-neutral-500'
               : dark
                 ? 'bg-[#EFE6D3] text-[#441004] hover:bg-[#E5D8BD]'
-                : 'bg-sage-primary text-white hover:bg-sage-secondary'
+                : 'bg-brand-primary text-white hover:bg-brand-secondary'
               }`}
           >
             {soldOut ? 'Sold Out' : 'Add to Cart'}

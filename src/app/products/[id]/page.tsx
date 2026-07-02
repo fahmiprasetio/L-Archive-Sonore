@@ -18,7 +18,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-type ProductWithSpecs = Product & { specs?: string[] };
+type ProductWithSpecs = Product & { specs?: string[]; longDescription?: string };
 
 export default function ProductDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
@@ -48,7 +48,11 @@ export default function ProductDetailPage({ params }: PageProps) {
     const fromStore = products.find((p) => p.id === id);
     const fromMock = MOCK_PRODUCTS.find((p) => p.id === id);
     if (fromStore) {
-      return fromMock?.specs ? { ...fromStore, specs: fromMock.specs } : fromStore;
+      return {
+        ...fromStore,
+        specs: fromMock?.specs,
+        longDescription: fromMock?.longDescription,
+      };
     }
     return fromMock;
   }, [products, id]);
@@ -181,6 +185,12 @@ export default function ProductDetailPage({ params }: PageProps) {
             <p className="text-neutral-600 leading-relaxed">
               {product.description}
             </p>
+
+            {product.longDescription && (
+              <p className="text-neutral-600 leading-relaxed">
+                {product.longDescription}
+              </p>
+            )}
 
             {product.specs && product.specs.length > 0 && (
               <div className="pt-4 border-t border-gray-100">

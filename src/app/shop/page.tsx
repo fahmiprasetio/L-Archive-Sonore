@@ -21,7 +21,7 @@ function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // State diinisialisasi dari URL → mendukung deep-link, share, & persist saat refresh.
+  // State diinisialisasi dari URL \u2192 mendukung deep-link, share, & persist saat refresh.
   const [searchQuery, setSearchQuery] = useState<string>(() => searchParams.get('q') ?? '');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
     const raw = searchParams.get('category');
@@ -178,7 +178,7 @@ function ShopContent() {
 
   return (
     <div className="relative w-full text-[#2E3A2C]">
-      {/* Hero fixed setinggi satu layar — diam saat scroll, jadi alas efek parallax. */}
+      {/* Hero fixed setinggi satu layar \u2014 diam saat scroll, jadi alas efek parallax. */}
       <div className="fixed inset-0 -z-10 flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#3A4438] px-6 text-center">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-white uppercase font-clash">
           The Archive Shop
@@ -225,7 +225,7 @@ function ShopContent() {
                   placeholder="Search instruments..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-sm py-2 pl-9 pr-8 border border-neutral-200 rounded-lg bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                  className="w-full text-sm py-2 pl-9 pr-8 border border-neutral-200 rounded-lg bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 transition"
                 />
                 {searchQuery && (
                   <button
@@ -247,7 +247,7 @@ function ShopContent() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full text-xs py-2.5 pl-3 pr-8 border border-neutral-200 rounded-lg bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 appearance-none font-semibold cursor-pointer transition"
+                  className="w-full text-xs py-2.5 pl-3 pr-8 border border-neutral-200 rounded-lg bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 appearance-none font-semibold cursor-pointer transition"
                 >
                   <option value="default">Relevance</option>
                   <option value="price-asc">Price: Low to High</option>
@@ -262,7 +262,7 @@ function ShopContent() {
               </div>
             </div>
 
-            {/* Category Filter — dropdown biar hemat tempat, checklist muncul saat dibuka */}
+            {/* Category Filter \u2014 dropdown biar hemat tempat, checklist muncul saat dibuka */}
             <div className="mb-6 pb-6 border-b border-black/10">
               <button
                 type="button"
@@ -275,7 +275,7 @@ function ShopContent() {
                 </span>
                 <span className="flex items-center gap-2">
                   {selectedCategories.length > 0 && (
-                    <span className="text-[10px] font-bold bg-sage-primary/15 text-sage-primary rounded-full px-2 py-0.5">
+                    <span className="text-[10px] font-bold bg-brand-primary/15 text-brand-primary rounded-full px-2 py-0.5">
                       {selectedCategories.length}
                     </span>
                   )}
@@ -298,7 +298,7 @@ function ShopContent() {
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => toggleCategory(category)}
-                            className="h-4 w-4 rounded border-neutral-300 text-sage-primary focus:ring-sage-secondary cursor-pointer accent-sage-primary"
+                            className="h-4 w-4 rounded border-neutral-300 text-brand-primary focus:ring-brand-secondary cursor-pointer accent-brand-primary"
                           />
                           <span className={isChecked ? 'font-medium text-neutral-950' : ''}>
                             {category}
@@ -327,10 +327,10 @@ function ShopContent() {
                     placeholder="Min"
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                    className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 transition"
                   />
                 </div>
-                <span className="text-neutral-400 text-sm">—</span>
+                <span className="text-neutral-400 text-sm">\u2014</span>
                 <div className="relative flex-1">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">$</span>
                   <input
@@ -338,7 +338,7 @@ function ShopContent() {
                     placeholder="Max"
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                    className="w-full text-xs py-2 pl-6 pr-2 border border-neutral-200 rounded bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 transition"
                   />
                 </div>
               </div>
@@ -354,7 +354,7 @@ function ShopContent() {
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={(e) => setInStockOnly(e.target.checked)}
-                  className="h-4 w-4 rounded border-neutral-300 text-sage-primary focus:ring-sage-secondary cursor-pointer accent-sage-primary"
+                  className="h-4 w-4 rounded border-neutral-300 text-brand-primary focus:ring-brand-secondary cursor-pointer accent-brand-primary"
                 />
                 <span className={inStockOnly ? 'font-medium text-neutral-950' : ''}>In stock only</span>
               </label>
@@ -368,10 +368,10 @@ function ShopContent() {
                 onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 border border-neutral-200 rounded-lg bg-white text-sm font-semibold text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition cursor-pointer"
               >
-                <SlidersHorizontal className="h-4 w-4 text-sage-primary" />
+                <SlidersHorizontal className="h-4 w-4 text-brand-primary" />
                 <span>{isMobileFiltersOpen ? 'Hide Filters' : 'Show Filters'}</span>
                 {selectedCategories.length > 0 && (
-                  <span className="ml-1 bg-sage-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  <span className="ml-1 bg-brand-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                     {selectedCategories.length}
                   </span>
                 )}
@@ -403,7 +403,7 @@ function ShopContent() {
                       placeholder="Search instruments..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full text-sm py-2.5 pl-9 pr-8 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                      className="w-full text-sm py-2.5 pl-9 pr-8 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 transition"
                     />
                     {searchQuery && (
                       <button
@@ -424,7 +424,7 @@ function ShopContent() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full text-xs py-2.5 pl-3 pr-8 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 appearance-none font-semibold cursor-pointer transition"
+                      className="w-full text-xs py-2.5 pl-3 pr-8 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 appearance-none font-semibold cursor-pointer transition"
                     >
                       <option value="default">Relevance</option>
                       <option value="price-asc">Price: Low to High</option>
@@ -452,12 +452,12 @@ function ShopContent() {
                           onClick={() => toggleCategory(category)}
                           className={`text-xs py-1.5 px-3 rounded-full border transition flex items-center gap-1.5 cursor-pointer ${
                             isChecked
-                              ? 'bg-sage-primary/10 border-sage-primary text-sage-primary font-semibold'
+                              ? 'bg-brand-primary/10 border-brand-primary text-brand-primary font-semibold'
                               : 'border-neutral-200 text-neutral-600 hover:border-neutral-300 bg-neutral-50 hover:bg-neutral-100'
                           }`}
                         >
                           {category}
-                          <span className={`text-[10px] rounded-full px-1.5 py-0.2 ${isChecked ? 'bg-sage-primary/20 text-sage-primary' : 'bg-neutral-200 text-neutral-500'}`}>
+                          <span className={`text-[10px] rounded-full px-1.5 py-0.2 ${isChecked ? 'bg-brand-primary/20 text-brand-primary' : 'bg-neutral-200 text-neutral-500'}`}>
                             {categoryCounts[category]}
                           </span>
                         </button>
@@ -478,10 +478,10 @@ function ShopContent() {
                         placeholder="Min"
                         value={minPrice}
                         onChange={(e) => setMinPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                        className="w-full text-xs py-2.5 pl-6 pr-2 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                        className="w-full text-xs py-2.5 pl-6 pr-2 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 transition"
                       />
                     </div>
-                    <span className="text-neutral-400 text-sm">—</span>
+                    <span className="text-neutral-400 text-sm">\u2014</span>
                     <div className="relative flex-1">
                       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">$</span>
                       <input
@@ -489,7 +489,7 @@ function ShopContent() {
                         placeholder="Max"
                         value={maxPrice}
                         onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                        className="w-full text-xs py-2.5 pl-6 pr-2 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sage-primary text-neutral-900 transition"
+                        className="w-full text-xs py-2.5 pl-6 pr-2 border border-neutral-200 rounded-lg bg-neutral-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-primary text-neutral-900 transition"
                       />
                     </div>
                   </div>
@@ -504,7 +504,7 @@ function ShopContent() {
                       type="checkbox"
                       checked={inStockOnly}
                       onChange={(e) => setInStockOnly(e.target.checked)}
-                      className="h-4 w-4 rounded border-neutral-300 text-sage-primary focus:ring-sage-secondary cursor-pointer accent-sage-primary"
+                      className="h-4 w-4 rounded border-neutral-300 text-brand-primary focus:ring-brand-secondary cursor-pointer accent-brand-primary"
                     />
                     <span className={inStockOnly ? 'font-medium text-neutral-950' : ''}>In stock only</span>
                   </label>
@@ -513,7 +513,7 @@ function ShopContent() {
             )}
           </div>
 
-          {/* Shop Main Products Display Column — kanan hanya card barang + pagination di bawah */}
+          {/* Shop Main Products Display Column \u2014 kanan hanya card barang + pagination di bawah */}
           <div className="flex-grow w-full min-w-0">
             {selectedCategories.length > 0 && (
               <div className="flex flex-wrap gap-1.5 items-center mb-6">
@@ -566,7 +566,7 @@ function ShopContent() {
                           onClick={() => setCurrentPage(n)}
                           className={`min-w-9 px-3 py-1.5 text-xs font-bold rounded-lg border transition cursor-pointer ${
                             n === safePage
-                              ? 'bg-sage-primary border-sage-primary text-white'
+                              ? 'bg-brand-primary border-brand-primary text-white'
                               : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50'
                           }`}
                         >
@@ -583,7 +583,7 @@ function ShopContent() {
                     </nav>
                   )}
                   <p className="text-xs text-[#2E3A2C]/70 font-semibold uppercase tracking-wider">
-                    Showing <span className="text-[#2E3A2C] font-bold">{pageStart + 1}–{pageEnd}</span> of {sortedProducts.length} Instruments
+                    Showing <span className="text-[#2E3A2C] font-bold">{pageStart + 1}\u2013{pageEnd}</span> of {sortedProducts.length} Instruments
                   </p>
                 </div>
               </>
@@ -598,7 +598,7 @@ function ShopContent() {
                 </p>
                 <button
                   onClick={handleResetFilters}
-                  className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-sage-primary text-white rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-sage-secondary transition cursor-pointer"
+                  className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-white rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-brand-secondary transition cursor-pointer"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   Clear All Filters
