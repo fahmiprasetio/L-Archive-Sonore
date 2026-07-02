@@ -81,7 +81,7 @@ export default function Footer() {
     <footer
       ref={footerOuterRef}
       className={`w-full bg-black text-[#EFE6D3] select-none font-sans relative overflow-visible z-50 ${
-        isHome ? '-mt-24' : isShop ? 'mt-0' : 'mt-16'
+        isHome ? '-mt-12' : isShop ? 'mt-0' : 'mt-16'
       }`}
     >
       {/* Cloud Transition Asset Wrapper for Parallax (height 0 to avoid blank layout space) */}

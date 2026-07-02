@@ -138,7 +138,7 @@ export default function Home() {
         </div>
 
         {/* Section merah — z-10, di belakang awan */}
-        <div className="relative z-10 bg-[#441004] w-full text-white pb-40 -mt-[12%]">
+        <div className="relative z-10 bg-[#441004] w-full text-white pb-72 -mt-[12%]">
           {/* Brand Intro Callout Section */}
           <div className="max-w-4xl mx-auto px-6 pt-66 pb-40 text-center flex flex-col items-center justify-center space-y-8 select-none">
             <h2 className="font-clash font-medium text-white text-2xl sm:text-3xl md:text-4xl uppercase tracking-widest leading-none">
