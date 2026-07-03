@@ -181,7 +181,7 @@ function ShopContent() {
       {/* Hero fixed setinggi satu layar \u2014 diam saat scroll, jadi alas efek parallax. */}
       <div
         className="fixed inset-0 -z-10 flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-cover bg-center px-6 text-center"
-        style={{ backgroundImage: "url('/hero-shop.png')" }}
+        style={{ backgroundImage: "url('/hero-shop.webp')" }}
       >
         <div className="absolute inset-0 bg-black/30 -z-10" />
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider text-white uppercase font-clash">
