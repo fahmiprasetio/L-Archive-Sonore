@@ -44,3 +44,10 @@ screenshotan/
 output.txt
 
 prompt.txt
+# Local one-off scripts & AI tooling artifacts
+convert.py
+rename.py
+call_init.js
+mcp_init.json
+skills-lock.json
+.agents/
