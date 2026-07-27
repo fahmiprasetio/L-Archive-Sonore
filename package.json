@@ -11,17 +11,17 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@notionhq/client": "^5.22.0",
-    "@sentry/nextjs": "^10.63.0",
-    "@supabase/supabase-js": "^2.110.0",
+    "@notionhq/client": "^5.23.2",
+    "@sentry/nextjs": "^10.68.0",
+    "@supabase/supabase-js": "^2.110.8",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.35.1",
-    "lucide-react": "^1.22.0",
+    "lucide-react": "^1.27.0",
     "midtrans-client": "^1.4.3",
-    "next": "16.2.9",
+    "next": "16.2.12",
     "postgres": "^3.4.9",
-    "react": "19.2.7",
-    "react-dom": "19.2.7",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
@@ -30,9 +30,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^10",
-    "eslint-config-next": "16.2.9",
+    "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
     "typescript": "^6",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   }
 }
